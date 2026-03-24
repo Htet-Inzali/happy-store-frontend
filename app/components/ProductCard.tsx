@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useAuth } from "@/context/AuthContext"; // 🌟 Admin စစ်ရန် Import လုပ်ထားသည်
+import { useAuth } from "@/context/AuthContext";
+import React from "react"; // 🌟 Admin စစ်ရန် Import လုပ်ထားသည်
 
 export default function ProductCard({ product }: { product: any }) {
     const { addToCart } = useCart();
@@ -24,7 +25,8 @@ export default function ProductCard({ product }: { product: any }) {
             imageUrl = product.imageUrl;
         } else {
             const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api", "") || "http://localhost:8080";
-            imageUrl = `${backendUrl}${product.imageUrl}`;
+            const cleanImageUrl = product.imageUrl.startsWith("/") ? product.imageUrl : `/${product.imageUrl}`;
+            imageUrl = `${backendUrl}${cleanImageUrl}`;
         }
     }
 

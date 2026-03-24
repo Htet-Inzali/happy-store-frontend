@@ -5,18 +5,24 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
     const { totalItems } = useCart();
     const pathname = usePathname();
+    const [isMounted, setIsMounted] = useState(false);
 
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
     const activeLink = (path: string) =>
         pathname === path ? "text-blue-600 font-black" : "text-gray-600 font-bold hover:text-blue-600";
 
     // 🌟 Admin ဟုတ်မဟုတ် စစ်ဆေးခြင်း
     const isAdmin = user?.role === "ADMIN";
 
+    if (!isMounted)
     return (
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

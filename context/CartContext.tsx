@@ -36,24 +36,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }, [cartItems]);
 
     const addToCart = (product: any) => {
-        // 🌟 1. Stock Limit စစ်ဆေးခြင်းနှင့် Toast ပြသခြင်းများကို State Update မလုပ်ခင် အပြင်ဘက်တွင် ကြိုတင်လုပ်ဆောင်ပါမည်
         const existingItem = cartItems.find((item) => item.id === product.id);
 
+        // 🌟 ပြင်ဆင်ချက်: Stock မလောက်ပါက ခြင်းတောင်းထဲ ဆက်မထည့်ဘဲ ရပ်တန့် (return) ပါမည်
         if (existingItem && product.totalStock > 0 && existingItem.quantity >= product.totalStock) {
-            toast.error(`လက်ကျန် ${product.totalStock} ခုသာ ရှိပါတော့သည်။ ပိုမိုလိုချင်ပါက Preorder တင်ရန် Admin သို့ ဆက်သွယ်ပါ။`, { duration: 4000 });
-            return; // Stock ပြည့်သွားလျှင် အောက်သို့ဆက်မသွားဘဲ ရပ်လိုက်မည်
+            toast.error(`လက်ကျန် ${product.totalStock} ခုသာ ရှိပါတော့သည်။`);
+            return; // 🌟 ဒါလေး ထည့်လိုက်ပါပြီ
         }
 
-        if (existingItem) {
-            toast.success("ခြင်းတောင်းထဲ ထပ်ထည့်လိုက်ပါပြီ");
-        } else {
-            toast.success(product.totalStock > 0 ? "ခြင်းတောင်းထဲ ထည့်လိုက်ပါပြီ" : "Preorder စာရင်းထဲ ထည့်လိုက်ပါပြီ");
-        }
-
-        // 🌟 2. State Update ကို သီးသန့် သန့်သန့်ရှင်းရှင်း လုပ်ဆောင်မည် (React Error ဖြေရှင်းပြီး)
         setCartItems((prevItems) => {
-            const itemInPrev = prevItems.find((item) => item.id === product.id);
-            if (itemInPrev) {
+            if (existingItem) {
                 return prevItems.map((item) =>
                     item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
                 );
@@ -67,6 +59,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                 totalStock: product.totalStock || 0
             }];
         });
+        toast.success("ခြင်းတောင်းထဲ ထည့်လိုက်ပါပြီ");
     };
 
     const updateQuantity = (id: number, quantity: number) => {

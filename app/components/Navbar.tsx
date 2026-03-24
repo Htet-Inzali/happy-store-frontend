@@ -22,7 +22,7 @@ export default function Navbar() {
     // 🌟 Admin ဟုတ်မဟုတ် စစ်ဆေးခြင်း
     const isAdmin = user?.role === "ADMIN";
 
-    if (!isMounted)
+    if (!isMounted) return null;
     return (
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

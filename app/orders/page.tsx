@@ -35,20 +35,22 @@ export default function OrdersPage() {
                     <Link href={`/orders/${order.id}`} key={order.id} className="block bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
                         <div className="flex justify-between items-center mb-4">
                             <div>
-                                <p className="text-sm text-gray-500 font-bold">အော်ဒါနံပါတ်: #{order.id}</p>
+                                <p className="text-sm text-gray-500 font-bold">အော်ဒါနံပါတ်: #{order.orderNumber || order.id}</p>
                                 <p className="text-xs text-gray-400 mt-1">{new Date(order.orderDate).toLocaleString()}</p>
                             </div>
                             <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
                                 order.status === 'PREORDER_PENDING' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'
                             }`}>
-                                {order.status}
+                                {order.status === 'PREORDER_PENDING' ? 'PREORDER' : order.status}
                             </span>
                         </div>
                         <div className="border-t border-dashed pt-4 flex justify-between items-center">
-                            <span className="text-xs font-bold text-gray-400">{order.items?.length || 0} items</span>
+                            {/* 🌟 Delivery ပုံစံကိုပါ အကြမ်းဖျင်း ထည့်ပြထားသည် */}
+                            <span className="text-xs font-bold text-gray-400">
+                                {order.items?.length || 0} items • {order.deliveryMethod === 'PICKUP' ? 'ဆိုင်လာယူမည်' : 'အိမ်အရောက်ပို့'}
+                            </span>
                             <p className="text-base font-black text-gray-800">
-                                {/* 🌟 Ks အစား VND ဟု အတိအကျ ပြင်ဆင်ထားသည် */}
-                                စုစုပေါင်း: {order.totalAmountVND?.toLocaleString()} VND
+                                စုစုပေါင်း: {Number(order.totalAmountVND || 0).toLocaleString()} ₫
                             </p>
                         </div>
                     </Link>

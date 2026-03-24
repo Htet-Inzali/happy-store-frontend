@@ -4,23 +4,39 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-
-const DELIVERY_FEE_VND = 30000;
-const FREE_DELIVERY_THRESHOLD = 500000;
 
 export default function CartPage() {
     const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
     const { user } = useAuth();
     const router = useRouter();
 
+    // 🌟 API မှ ရယူမည့် ဆက်တင်များအတွက် State များ
+    const [deliveryFee, setDeliveryFee] = useState(30000);
+    const [freeThreshold, setFreeThreshold] = useState(500000);
+
+    // 🌟 Backend မှ Settings များ လှမ်းယူခြင်း (Hardcode အစားထိုးခြင်း)
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get("/settings/all");
+                if (res.data.success && Object.keys(res.data.data).length > 0) {
+                    setDeliveryFee(res.data.data["DELIVERY_FEE_VND"] || 30000);
+                    setFreeThreshold(res.data.data["FREE_DELIVERY_THRESHOLD"] || 500000);
+                }
+            } catch (error) {
+                console.error("Settings fetch error");
+            }
+        };
+        fetchSettings();
+    }, []);
+
     const [deliveryType, setDeliveryType] = useState("COD");
     const [contactName, setContactName] = useState(user?.fullName || "");
     const [contactPhone, setContactPhone] = useState(user?.phone || "");
     const [shippingAddress, setShippingAddress] = useState(user?.address || "");
 
-    // 🌟 ပုံလမ်းကြောင်း အမှန်တကယ်ရယူမည့် Function
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api", "") || "http://localhost:8080";
     const getResolvedImageUrl = (url?: string) => {
         if (!url) return "https://via.placeholder.com/300?text=No+Image";
@@ -34,8 +50,9 @@ export default function CartPage() {
     const inStockTotal = inStockItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * item.quantity), 0);
     const preorderTotal = preorderItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * item.quantity), 0);
 
-    const finalDeliveryFee = (deliveryType === "COD" && inStockTotal > 0 && inStockTotal < FREE_DELIVERY_THRESHOLD)
-        ? DELIVERY_FEE_VND : 0;
+    // 🌟 State မှ ရလာသော Dynamic Settings များကို သုံး၍ ပို့ဆောင်ခ တွက်ချက်သည်
+    const finalDeliveryFee = (deliveryType === "COD" && inStockTotal > 0 && inStockTotal < freeThreshold)
+        ? deliveryFee : 0;
 
     const grandTotalInStockVND = inStockTotal + finalDeliveryFee;
 
@@ -84,12 +101,10 @@ export default function CartPage() {
                         <p className="text-blue-600 font-black text-sm mt-1">{Number(item.currentPriceVND).toLocaleString()} VND</p>
                         <div className="mt-2 flex items-center bg-gray-50 w-fit rounded-lg border border-gray-100">
 
-                            {/* အနုတ် ခလုတ် */}
                             <button onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))} className="px-3 py-1 font-black text-gray-500 hover:text-blue-600 transition-colors">−</button>
 
                             <span className="font-black text-gray-900 px-2 text-sm">{item.quantity}</span>
 
-                            {/* 🌟 အပေါင်း ခလုတ် (Stock စစ်ဆေးသည့် Logic ပါဝင်သည်) */}
                             <button
                                 onClick={() => {
                                     if (item.totalStock > 0 && item.quantity >= item.totalStock) {

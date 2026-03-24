@@ -2,20 +2,23 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext"; // 🌟 ၁။ Wishlist ကို Import လုပ်ထားပါသည်
+import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext"; // 🌟 Admin စစ်ရန် Import လုပ်ထားသည်
 
 export default function ProductCard({ product }: { product: any }) {
     const { addToCart } = useCart();
-    const { toggleWishlist, isInWishlist } = useWishlist(); // 🌟 ၂။ Hook ခေါ်ထားပါသည်
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const { user } = useAuth(); // 🌟 User Data ဆွဲယူခြင်း
+
+    const isAdmin = user?.role === "ADMIN";
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
+        if (isAdmin) return; // Admin ဆိုလျှင် ဝယ်ခွင့်မပေးပါ
         addToCart(product);
     };
 
-    // ပုံ URL ကို Database မှ မှန်ကန်စွာ ဆွဲယူခြင်း
     let imageUrl = "https://via.placeholder.com/300?text=No+Image";
-
     if (product.imageUrl) {
         if (product.imageUrl.startsWith("http")) {
             imageUrl = product.imageUrl;
@@ -28,7 +31,6 @@ export default function ProductCard({ product }: { product: any }) {
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-lg transition-all group flex flex-col h-full relative">
 
-            {/* 🌟 ၃။ Stock စာသားကို ဘယ်ဘက်ထောင့်သို့ ရွှေ့လိုက်ပါသည် (အသည်းပုံနှင့် မထပ်စေရန် left-6 ဟု ပြင်ထားသည်) */}
             <div className="absolute top-6 left-6 z-10">
                 {product.totalStock > 0 ? (
                     <span className="bg-green-100 text-green-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
@@ -41,16 +43,18 @@ export default function ProductCard({ product }: { product: any }) {
                 )}
             </div>
 
-            {/* 🌟 ၄။ အသည်းပုံ (Wishlist) ခလုတ်ကို ညာဘက်ထောင့်တွင် နေရာချထားပါသည် */}
-            <button
-                onClick={(e) => {
-                    e.preventDefault(); // ပစ္စည်းအသေးစိတ် Page သို့ မရောက်သွားစေရန် တားပေးသည်
-                    toggleWishlist(product);
-                }}
-                className="absolute top-5 right-5 z-20 flex items-center justify-center w-9 h-9 bg-white/90 rounded-full shadow-md hover:scale-110 transition-transform"
-            >
-                {isInWishlist(product.id) ? "❤️" : "🤍"}
-            </button>
+            {/* 🌟 Admin မဟုတ်မှသာ အသည်းပုံ (Wishlist) ကို ပြမည် */}
+            {!isAdmin && (
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        toggleWishlist(product);
+                    }}
+                    className="absolute top-5 right-5 z-20 flex items-center justify-center w-9 h-9 bg-white/90 rounded-full shadow-md hover:scale-110 transition-transform"
+                >
+                    {isInWishlist(product.id) ? "❤️" : "🤍"}
+                </button>
+            )}
 
             <Link href={`/products/${product.id}`} className="flex-1 mt-2">
                 <div className="w-full aspect-square bg-gray-50 rounded-xl overflow-hidden relative">
@@ -78,16 +82,21 @@ export default function ProductCard({ product }: { product: any }) {
                     {Number(product.currentPriceVND || 0).toLocaleString()} VND
                 </span>
 
-                <button
-                    onClick={handleAddToCart}
-                    className={`font-bold text-sm px-4 py-2 rounded-xl transition-colors ${
-                        product.totalStock > 0
-                            ? 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white'
-                            : 'bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-600 hover:text-white'
-                    }`}
-                >
-                    {product.totalStock > 0 ? "ဝယ်မည်" : "Preorder"}
-                </button>
+                {/* 🌟 Admin ဆိုလျှင် 'Preview Only' ဟုသာ ပြမည် */}
+                {!isAdmin ? (
+                    <button
+                        onClick={handleAddToCart}
+                        className={`font-bold text-sm px-4 py-2 rounded-xl transition-colors ${
+                            product.totalStock > 0
+                                ? 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white'
+                                : 'bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-600 hover:text-white'
+                        }`}
+                    >
+                        {product.totalStock > 0 ? "ဝယ်မည်" : "Preorder"}
+                    </button>
+                ) : (
+                    <div className="text-xs font-bold text-gray-400 py-2 border border-dashed border-gray-300 px-3 rounded-lg bg-gray-50">Preview Only</div>
+                )}
             </div>
         </div>
     );

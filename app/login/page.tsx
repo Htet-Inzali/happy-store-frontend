@@ -12,14 +12,22 @@ export default function LoginPage() {
     const router = useRouter();
     const { login } = useAuth();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    // 🌟 ပြင်ဆင်ချက်: TypeScript Error မတက်စေရန် React.SyntheticEvent ကို ပြောင်းသုံးထားပါသည်
+    const handleLogin = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         try {
             const response = await api.post("/auth/login", { credential, password });
             if (response.data.success) {
                 login(response.data.data.token);
                 toast.success("Login အောင်မြင်ပါသည်။");
-                router.push("/");
+
+                // Admin လား User လား စစ်ဆေးပြီး လမ်းကြောင်းခွဲပို့မည်
+                const userRole = response.data.data.role || response.data.data.user?.role;
+                if (userRole === "ADMIN") {
+                    router.push("/admin/orders"); // Admin ဆိုလျှင် Admin Panel သို့
+                } else {
+                    router.push("/"); // User ဆိုလျှင် Home Page သို့
+                }
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "အကောင့် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်။");

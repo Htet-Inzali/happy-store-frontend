@@ -8,25 +8,58 @@ import ProductCard from "./components/ProductCard";
 export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [waking, setWaking] = useState(false); // 🌟 ဆာဗာ နိုးနေတုန်း (cold start) ဖြစ်/မဖြစ်
+  const [errorMsg, setErrorMsg] = useState(""); // 🌟 အမှားပြရန်
 
   // 🌟 Search အတွက် State အသစ်
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
+    // 🌟 Cold start ကြောင့် ၈ စက္ကန့်ထက်ကြာရင် "ဆာဗာ နိုးနေတုန်း" message ပြမယ်
+    const wakeTimer = setTimeout(() => {
+      if (!cancelled) setWaking(true);
+    }, 8000);
+
     const fetchProducts = async () => {
-      try {
-        const response = await api.get("/products");
-        if (response.data.success) {
-          setProducts(response.data.data);
+      const maxAttempts = 5; // Render cold start အတွက် အကြိမ်ကြိမ် ထပ်ကြိုးစားမယ်
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const response = await api.get("/products", { timeout: 30000 });
+          if (cancelled) return;
+          if (response.data.success) {
+            setProducts(response.data.data);
+          }
+          setErrorMsg("");
+          return; // အောင်မြင်ရင် ထွက်မယ်
+        } catch (error) {
+          console.error(`Products ယူရာတွင် အမှားအယွင်း (ကြိုးစားမှု ${attempt}):`, error);
+          if (cancelled) return;
+          if (attempt === maxAttempts) {
+            setErrorMsg(
+                "ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ။ Internet ကို စစ်ဆေးပြီး ပြန်ကြိုးစားကြည့်ပါ။"
+            );
+          } else {
+            // ၃ စက္ကန့် စောင့်ပြီး ပြန်ကြိုးစားမယ် (backend နိုးချိန်ပေး)
+            await new Promise((r) => setTimeout(r, 3000));
+          }
         }
-      } catch (error) {
-        console.error("Products ယူရာတွင် အမှားအယွင်းရှိပါသည်:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchProducts().finally(() => {
+      if (!cancelled) {
+        clearTimeout(wakeTimer);
+        setWaking(false);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(wakeTimer);
+    };
   }, []);
 
   // 🌟 ရှာဖွေထားသော စာသားနဲ့ ကိုက်ညီတဲ့ ပစ္စည်းတွေကို စစ်ထုတ်ခြင်း (နာမည် သို့မဟုတ် SKU)
@@ -35,7 +68,33 @@ export default function HomePage() {
       (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  if (loading) return <div className="text-center py-20 font-bold text-blue-600 animate-pulse">Loading...</div>;
+  if (loading)
+    return (
+        <div className="flex flex-col items-center justify-center py-32 px-4 text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+          <p className="font-bold text-blue-600 text-lg">ပစ္စည်းများ ရယူနေပါသည်...</p>
+          {waking && (
+              <p className="mt-3 text-sm text-gray-500 max-w-sm font-myanmar leading-relaxed">
+                ဆာဗာ ပြန်နိုးနေသောကြောင့် ပထမဆုံးအကြိမ် ၁ မိနစ်ခန့် ကြာနိုင်ပါသည်။
+                ကျေးဇူးပြု၍ ခဏစောင့်ပေးပါ။ 🙏
+              </p>
+          )}
+        </div>
+    );
+
+  if (errorMsg)
+    return (
+        <div className="flex flex-col items-center justify-center py-32 px-4 text-center">
+          <span className="text-5xl mb-4 block">⚠️</span>
+          <p className="font-bold text-red-600 text-lg mb-6 max-w-sm font-myanmar">{errorMsg}</p>
+          <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"
+          >
+            ပြန်ကြိုးစားမည်
+          </button>
+        </div>
+    );
 
   return (
       <div className="container mx-auto px-4 py-8 max-w-7xl font-myanmar">

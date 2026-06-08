@@ -28,6 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "Walk-in Sale", path: "/admin/walk-in", icon: "🛍️" },
         { name: "Orders", path: "/admin/orders", icon: "🛒️" },
         { name: "Products", path: "/admin/products", icon: "📦" },
+        { name: "Settings", path: "/admin/settings", icon: "⚙️" },
     ];
 
     // 🌟 ပြင်ဆင်ချက် ၃: Loading ဖြစ်နေချိန်တွင် Loading UI ပြပေးထားပါမည်

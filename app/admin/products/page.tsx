@@ -309,7 +309,7 @@ export default function AdminProductListPage() {
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className="text-2xl font-black text-gray-900 mb-2">Excel မှတ်တမ်းများကို စစ်ဆေးပါ (Preview)</h2>
-                                <p className="text-gray-500 text-sm">အမြတ်များကို တိုက်စစ်နိုင်ရန် အောက်ပါ ငွေလဲနှုန်းကို လိုသလို ပြောင်းလဲနိုင်ပါသည်။</p>
+                                <p className="text-gray-500 text-sm">ရောင်းဈေးမှာ သင် Excel တွင် ထည့်ထားသော ဈေးဖြစ်သည်။ ငွေလဲနှုန်းကို <b>အရင်း (MMK→VND) ပြောင်းရန်သာ</b> သုံးပါသည်။</p>
                             </div>
                             <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center space-x-3">
                                 <label className="text-xs font-bold text-gray-500">Rate (1 MMK = ? VND)</label>
@@ -321,30 +321,42 @@ export default function AdminProductListPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-[10px] tracking-widest sticky top-0 shadow-sm z-10">
                                 <tr>
-                                    <th className="p-4">အမည်</th>
-                                    <th className="p-4">SKU</th>
-                                    <th className="p-4">အလေးချိန်</th>
-                                    <th className="p-4">ဝယ်ရင်း+သယ်ယူခ</th>
-                                    <th className="p-4">အဖွင့် Qty</th>
-                                    <th className="p-4">ရောင်းဈေး (VND)</th>
-                                    <th className="p-4 bg-yellow-50 text-gray-900">ခန့်မှန်း အမြတ် (VND)</th>
+                                    <th className="p-3">အမည်</th>
+                                    <th className="p-3">အလေးချိန်</th>
+                                    <th className="p-3 text-right">ဝယ်ဈေး<br/>(MMK)</th>
+                                    <th className="p-3 text-right">သယ်ယူခ<br/>(MMK)</th>
+                                    <th className="p-3 text-right bg-orange-50 text-orange-700">စုစုပေါင်း အရင်း<br/>(MMK → VND)</th>
+                                    <th className="p-3 text-center">Qty</th>
+                                    <th className="p-3 text-right bg-blue-50 text-blue-700">ရောင်းဈေး<br/>(VND)</th>
+                                    <th className="p-3 text-right bg-yellow-50 text-gray-900">အမြတ်/ခု<br/>(VND)</th>
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                 {previewData.map((d: any, i: number) => {
-                                    const profit = calculateLiveProfit(d.originalPriceMMK, d.kiloRateMMK, d.currentPriceVND, d.weightGram, previewExchangeRate);
+                                    const rate = Number(previewExchangeRate) || 0;
+                                    const origMMK = Number(d.originalPriceMMK) || 0;
+                                    // သယ်ယူခ = အလေးချိန်(kg) × kilo rate
+                                    const kiloCostMMK = ((Number(d.weightGram) || 0) / 1000) * (Number(d.kiloRateMMK) || 0);
+                                    const totalCostMMK = origMMK + kiloCostMMK;
+                                    const totalCostVND = totalCostMMK * rate;
+                                    const salePrice = Number(d.currentPriceVND) || 0; // user ထည့်သော ရောင်းဈေး
+                                    const profit = salePrice - totalCostVND;
                                     return (
                                         <tr key={i} className="hover:bg-green-50/30">
-                                            <td className="p-4 font-bold text-gray-800 text-sm">{d.name}</td>
-                                            <td className="p-4 text-xs text-gray-500">{d.sku}</td>
-                                            <td className="p-4 text-xs text-gray-500">{d.weightGram}g</td>
-                                            <td className="p-4 text-xs font-bold text-gray-600">
-                                                {Number(d.originalPriceMMK).toLocaleString()} + {Number(d.kiloRateMMK).toLocaleString()}/kg
+                                            <td className="p-3 font-bold text-gray-800 text-sm">{d.name}</td>
+                                            <td className="p-3 text-xs text-gray-500">{d.weightGram}g</td>
+                                            <td className="p-3 text-right text-xs text-gray-600">{origMMK.toLocaleString()}</td>
+                                            <td className="p-3 text-right text-xs text-gray-600">{Math.round(kiloCostMMK).toLocaleString()}</td>
+                                            <td className="p-3 text-right bg-orange-50/40">
+                                                <p className="font-bold text-gray-800 text-sm">{Math.round(totalCostMMK).toLocaleString()} Ks</p>
+                                                <p className="text-[11px] text-orange-600 font-bold">= {Math.round(totalCostVND).toLocaleString()} ₫</p>
                                             </td>
-                                            <td className="p-4 font-bold text-green-600 text-sm">{d.initialQuantity}</td>
-                                            <td className="p-4 font-black text-blue-600 text-sm">{Number(d.currentPriceVND).toLocaleString()} ₫</td>
-                                            <td className={`p-4 font-black text-sm bg-yellow-50/30 ${profit > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                {profit > 0 ? '+' : ''}{profit.toLocaleString()} ₫
+                                            <td className="p-3 text-center font-bold text-green-600 text-sm">{d.initialQuantity}</td>
+                                            <td className="p-3 text-right font-black text-blue-600 text-sm bg-blue-50/40">
+                                                {salePrice > 0 ? `${salePrice.toLocaleString()} ₫` : <span className="text-red-400 text-xs">မထည့်ရသေး</span>}
+                                            </td>
+                                            <td className={`p-3 text-right font-black text-sm bg-yellow-50/30 ${profit > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                {profit > 0 ? '+' : ''}{Math.round(profit).toLocaleString()} ₫
                                             </td>
                                         </tr>
                                     );

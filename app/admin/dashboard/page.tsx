@@ -3,11 +3,15 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
+import {
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from "recharts";
 
 export default function AdminDashboardPage() {
     const [summary, setSummary] = useState<any>(null);
     const [expiringBatches, setExpiringBatches] = useState<any[]>([]);
     const [topProducts, setTopProducts] = useState<any[]>([]);
+    const [salesTrend, setSalesTrend] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [dateFilter, setDateFilter] = useState("TODAY");
 
@@ -16,15 +20,27 @@ export default function AdminDashboardPage() {
             setLoading(true);
             try {
                 // 🌟 Filter ကို Backend သို့ ပို့၍ Data လှမ်းယူခြင်း
-                const [summaryRes, alertsRes, topRes] = await Promise.all([
+                const trendFilter = dateFilter === "MONTH" ? "MONTH" : "WEEK";
+                const [summaryRes, alertsRes, topRes, trendRes] = await Promise.all([
                     api.get(`/admin/dashboard/summary?filter=${dateFilter}`),
                     api.get("/admin/dashboard/alerts/expiring"),
-                    api.get("/admin/dashboard/top-products")
+                    api.get("/admin/dashboard/top-products"),
+                    api.get(`/admin/dashboard/sales-trend?filter=${trendFilter}`),
                 ]);
 
                 if (summaryRes.data.success) setSummary(summaryRes.data.data);
                 if (alertsRes.data.success) setExpiringBatches(alertsRes.data.data);
                 if (topRes.data.success) setTopProducts(topRes.data.data);
+                if (trendRes.data.success) {
+                    setSalesTrend(
+                        trendRes.data.data.map((p: any) => ({
+                            date: new Date(p.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }),
+                            revenue: Number(p.revenue || 0),
+                            profit: Number(p.profit || 0),
+                            orders: p.orders,
+                        }))
+                    );
+                }
             } catch (error) {
                 toast.error("Dashboard အချက်အလက်များ ယူရာတွင် အမှားရှိပါသည်။");
             } finally {
@@ -34,6 +50,8 @@ export default function AdminDashboardPage() {
 
         fetchDashboardData();
     }, [dateFilter]); // 🌟 Date ပြောင်းတိုင်း Data အသစ်ပြန်ဆွဲမည်
+
+    const fmtVND = (n: any) => Number(n || 0).toLocaleString();
 
     // 🌟 Excel File အစစ်ကို Backend မှ Download ဆွဲမည့် Function
     const handleDownloadExcel = async () => {
@@ -112,6 +130,80 @@ export default function AdminDashboardPage() {
                     <h3 className={`text-2xl font-black ${summary?.lowStockProductsCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>
                         {summary?.lowStockProductsCount || 0} မျိုး
                     </h3>
+                </div>
+            </div>
+
+            {/* 🌟 ဒုတိယ Metric Cards Row */}
+            <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}>
+                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">🧾 Order အရေအတွက်</p>
+                    <h3 className="text-xl font-black text-gray-900">{summary?.totalOrdersCount || 0} ခု</h3>
+                </div>
+                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">📦 ရောင်းရ ပစ္စည်း</p>
+                    <h3 className="text-xl font-black text-gray-900">{summary?.totalItemsSold || 0} ခု</h3>
+                </div>
+                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">📊 ပျမ်းမျှ Order</p>
+                    <h3 className="text-xl font-black text-gray-900">{fmtVND(summary?.averageOrderValueVND)} ₫</h3>
+                </div>
+                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">💹 အမြတ် Margin</p>
+                    <h3 className="text-xl font-black text-gray-900">{Number(summary?.profitMarginPercent || 0)}%</h3>
+                </div>
+            </div>
+
+            {/* 🌟 Sales Trend Chart + ဘေး panel */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                    <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center">
+                        <span className="text-2xl mr-2">📈</span> ရောင်းအား Trend ({dateFilter === "MONTH" ? "၃၀ ရက်" : "၇ ရက်"})
+                    </h2>
+                    {salesTrend.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={280}>
+                            <AreaChart data={salesTrend} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="prof" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#16A34A" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#16A34A" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
+                                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#9CA3AF" }} />
+                                <YAxis tick={{ fontSize: 11, fill: "#9CA3AF" }} tickFormatter={(v) => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v} />
+                                <Tooltip formatter={(v: any) => `${Number(v).toLocaleString()} ₫`} />
+                                <Legend />
+                                <Area type="monotone" dataKey="revenue" name="ဝင်ငွေ" stroke="#2563EB" strokeWidth={2} fill="url(#rev)" />
+                                <Area type="monotone" dataKey="profit" name="အမြတ်" stroke="#16A34A" strokeWidth={2} fill="url(#prof)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="text-center py-20 bg-gray-50 rounded-2xl text-gray-500 font-bold">ရောင်းအား data မရှိသေးပါ။</div>
+                    )}
+                </div>
+
+                {/* ဝင်ငွေ ခွဲခြမ်း + Inventory */}
+                <div className="space-y-4">
+                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-6 rounded-3xl shadow-md text-white">
+                        <p className="text-sm font-bold text-indigo-100 uppercase tracking-wider mb-3">ဝင်ငွေ ခွဲခြမ်း ({dateFilter})</p>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium">🛒 Online</span>
+                            <span className="font-black">{fmtVND(summary?.onlineRevenue)} ₫</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">🛍️ Walk-in</span>
+                            <span className="font-black">{fmtVND(summary?.walkInRevenue)} ₫</span>
+                        </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">🏬 လက်ကျန် Stock တန်ဖိုး</p>
+                        <h3 className="text-2xl font-black text-gray-900">{fmtVND(summary?.inventoryValueVND)} ₫</h3>
+                        <p className="text-xs text-gray-400 mt-2">ရောင်းနေသော ပစ္စည်း {summary?.totalActiveProducts || 0} မျိုး</p>
+                    </div>
                 </div>
             </div>
 

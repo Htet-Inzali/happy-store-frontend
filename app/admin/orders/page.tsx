@@ -11,6 +11,14 @@ export default function AdminOrderListPage() {
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [filter, setFilter] = useState<"online" | "walkin" | "all">("online");
+
+    const isWalkIn = (o: any) => typeof o.orderNumber === "string" && o.orderNumber.startsWith("POS-");
+    const onlineCount = orders.filter((o) => !isWalkIn(o)).length;
+    const walkinCount = orders.filter((o) => isWalkIn(o)).length;
+    const filteredOrders = orders.filter((o) =>
+        filter === "all" ? true : filter === "walkin" ? isWalkIn(o) : !isWalkIn(o)
+    );
 
     const fetchOrders = async () => {
         try {
@@ -88,9 +96,33 @@ export default function AdminOrderListPage() {
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-4">
-            <h1 className="text-3xl font-black mb-8 border-l-4 border-blue-600 pl-4 text-gray-800">
+            <h1 className="text-3xl font-black mb-6 border-l-4 border-blue-600 pl-4 text-gray-800">
                 အော်ဒါ စီမံခန့်ခွဲမှု
             </h1>
+
+            {/* 🌟 Filter Tabs — Online / Walk-in / All */}
+            <div className="flex gap-2 mb-6">
+                {[
+                    { key: "online", label: "🛒 Online", count: onlineCount },
+                    { key: "walkin", label: "🛍️ Walk-in", count: walkinCount },
+                    { key: "all", label: "အားလုံး", count: orders.length },
+                ].map((t) => (
+                    <button
+                        key={t.key}
+                        onClick={() => setFilter(t.key as any)}
+                        className={`px-5 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+                            filter === t.key
+                                ? "bg-gray-900 text-white shadow-md"
+                                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        }`}
+                    >
+                        {t.label}
+                        <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${filter === t.key ? "bg-white/20" : "bg-gray-100 text-gray-500"}`}>
+                            {t.count}
+                        </span>
+                    </button>
+                ))}
+            </div>
 
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full text-left border-collapse">
@@ -104,12 +136,14 @@ export default function AdminOrderListPage() {
                     </tr>
                     </thead>
                     <tbody>
-                    {orders.length === 0 ? (
+                    {filteredOrders.length === 0 ? (
                         <tr>
-                            <td colSpan={5} className="p-8 text-center text-gray-500 font-bold">ဝင်ထားသော အော်ဒါ မရှိသေးပါ။</td>
+                            <td colSpan={5} className="p-8 text-center text-gray-500 font-bold">
+                                {filter === "walkin" ? "ဆိုင်ရှေ့ ရောင်းအား မရှိသေးပါ။" : "ဝင်ထားသော အော်ဒါ မရှိသေးပါ။"}
+                            </td>
                         </tr>
                     ) : (
-                        orders.map((o) => {
+                        filteredOrders.map((o) => {
                             const statusInfo = getStatusStyle(o.status);
                             const orderDate = new Date(o.orderDate).toLocaleString();
 

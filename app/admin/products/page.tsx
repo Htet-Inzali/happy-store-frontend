@@ -103,8 +103,8 @@ export default function AdminProductListPage() {
                 setPreviewData([]);
                 await fetchProducts();
             }
-        } catch (error) {
-            toast.error("သိမ်းဆည်းရာတွင် အမှားရှိပါသည်", { id: toastId });
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "သိမ်းဆည်းရာတွင် အမှားရှိပါသည်", { id: toastId });
         } finally {
             setIsSubmitting(false);
         }

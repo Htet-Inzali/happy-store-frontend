@@ -61,7 +61,7 @@ export default function ProductDetailPage() {
 
                         <div className="mt-4 flex items-center space-x-4">
               <span className="text-3xl font-black text-blue-600">
-                {Number(product.price || 0).toLocaleString()} Ks
+                {Number(product.currentPriceVND || 0).toLocaleString()} VND
               </span>
                             <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-600 uppercase">In Stock</span>
                         </div>

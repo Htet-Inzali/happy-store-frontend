@@ -50,11 +50,12 @@ export default function CartPage() {
     const inStockTotal = inStockItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * item.quantity), 0);
     const preorderTotal = preorderItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * item.quantity), 0);
 
-    // 🌟 State မှ ရလာသော Dynamic Settings များကို သုံး၍ ပို့ဆောင်ခ တွက်ချက်သည်
-    const finalDeliveryFee = (deliveryType === "COD" && inStockTotal > 0 && inStockTotal < freeThreshold)
-        ? deliveryFee : 0;
+    // 🌟 ပို့ဆောင်ခ — total ထဲ မပေါင်းတော့ဘဲ note အဖြစ်သာ ပြသည် (COD တွင် ပို့ချိန်မှ သီးသန့်ကောက်ခံ)
+    // COD + 500,000 ထက်ကျော် → Free၊ မဟုတ်ရင် "Add-on Delivery Charge" note
+    const isFreeDelivery = deliveryType === "PICKUP" || inStockTotal >= freeThreshold;
 
-    const grandTotalInStockVND = inStockTotal + finalDeliveryFee;
+    // Grand total = ပစ္စည်းတန်ဖိုးသာ (ပို့ခ မပါ)
+    const grandTotalInStockVND = inStockTotal;
 
     const handleCheckout = async () => {
         if (!user) return toast.error("အော်ဒါတင်ရန် Login အရင်ဝင်ပေးပါ။");
@@ -161,10 +162,14 @@ export default function CartPage() {
                                 </div>
                                 <div className="flex justify-between text-sm mb-3 border-b border-blue-100 pb-3">
                                     <span className="text-gray-600 font-bold">ပို့ဆောင်ခ {deliveryType === "PICKUP" && "(ဆိုင်လာယူ)"}</span>
-                                    <span className="font-black text-orange-500">{finalDeliveryFee === 0 ? "အခမဲ့ (Free)" : `+ ${finalDeliveryFee.toLocaleString()} VND`}</span>
+                                    {isFreeDelivery ? (
+                                        <span className="font-black text-green-600">အခမဲ့ (Free)</span>
+                                    ) : (
+                                        <span className="font-bold text-orange-500 text-right">Add-on Delivery Charge<br/><span className="text-[10px] text-gray-400 font-medium">(ပို့ချိန်တွင် သီးသန့် ကောက်ခံပါမည်)</span></span>
+                                    )}
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="font-bold text-blue-900">စုစုပေါင်း</span>
+                                    <span className="font-bold text-blue-900">စုစုပေါင်း (ပစ္စည်းဖိုး)</span>
                                     <span className="text-2xl font-black text-blue-600">{grandTotalInStockVND.toLocaleString()} VND</span>
                                 </div>
                             </div>

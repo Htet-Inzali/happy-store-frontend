@@ -11,13 +11,26 @@ export default function AdminOrderListPage() {
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
-    const [filter, setFilter] = useState<"online" | "walkin" | "all">("online");
+    const [filter, setFilter] = useState<"online" | "walkin" | "preorder" | "all">("online");
+
+    // 🌟 Dashboard card မှ လာသောအခါ URL (?tab=preorder) အတိုင်း tab ဖွင့်ပေးသည်
+    useEffect(() => {
+        const tab = new URLSearchParams(window.location.search).get("tab");
+        if (tab === "preorder" || tab === "walkin" || tab === "all" || tab === "online") {
+            setFilter(tab);
+        }
+    }, []);
 
     const isWalkIn = (o: any) => typeof o.orderNumber === "string" && o.orderNumber.startsWith("POS-");
+    const isPreorder = (o: any) => o.status === "PREORDER_PENDING";
     const onlineCount = orders.filter((o) => !isWalkIn(o)).length;
     const walkinCount = orders.filter((o) => isWalkIn(o)).length;
+    const preorderCount = orders.filter(isPreorder).length;
     const filteredOrders = orders.filter((o) =>
-        filter === "all" ? true : filter === "walkin" ? isWalkIn(o) : !isWalkIn(o)
+        filter === "all" ? true
+            : filter === "walkin" ? isWalkIn(o)
+                : filter === "preorder" ? isPreorder(o)
+                    : !isWalkIn(o)
     );
 
     const fetchOrders = async () => {
@@ -105,6 +118,7 @@ export default function AdminOrderListPage() {
                 {[
                     { key: "online", label: "🛒 Online", count: onlineCount },
                     { key: "walkin", label: "🛍️ Walk-in", count: walkinCount },
+                    { key: "preorder", label: "⏳ Preorder", count: preorderCount },
                     { key: "all", label: "အားလုံး", count: orders.length },
                 ].map((t) => (
                     <button
@@ -139,7 +153,7 @@ export default function AdminOrderListPage() {
                     {filteredOrders.length === 0 ? (
                         <tr>
                             <td colSpan={5} className="p-8 text-center text-gray-500 font-bold">
-                                {filter === "walkin" ? "ဆိုင်ရှေ့ ရောင်းအား မရှိသေးပါ။" : "ဝင်ထားသော အော်ဒါ မရှိသေးပါ။"}
+                                {filter === "walkin" ? "ဆိုင်ရှေ့ ရောင်းအား မရှိသေးပါ။" : filter === "preorder" ? "ဖြည့်တင်းရန် Preorder မရှိပါ။ 🎉" : "ဝင်ထားသော အော်ဒါ မရှိသေးပါ။"}
                             </td>
                         </tr>
                     ) : (

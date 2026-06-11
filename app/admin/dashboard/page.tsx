@@ -119,7 +119,7 @@ export default function AdminDashboardPage() {
                     <p className="text-[11px] text-green-50 font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Orders ကြည့်ရန် →</p>
                 </Link>
 
-                <Link href="/admin/orders" className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer ${summary?.pendingPreordersCount > 0 ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100'}`}>
+                <Link href="/admin/orders?tab=preorder" className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer ${summary?.pendingPreordersCount > 0 ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100'}`}>
                     <div className="absolute top-0 right-0 p-4 opacity-10 transform group-hover:scale-110 transition-transform text-6xl">⏳</div>
                     <p className={`text-sm font-bold uppercase tracking-wider mb-2 ${summary?.pendingPreordersCount > 0 ? 'text-orange-500' : 'text-gray-400'}`}>ဖြည့်တင်းရန် Preorder</p>
                     <h3 className={`text-2xl font-black ${summary?.pendingPreordersCount > 0 ? 'text-orange-600' : 'text-gray-900'}`}>
@@ -128,7 +128,7 @@ export default function AdminDashboardPage() {
                     <p className="text-[11px] text-orange-500 font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Preorder ဖြည့်ရန် →</p>
                 </Link>
 
-                <Link href="/admin/products" className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer ${summary?.lowStockProductsCount > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
+                <Link href="/admin/products?lowstock=1" className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer ${summary?.lowStockProductsCount > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
                     <div className="absolute top-0 right-0 p-4 opacity-10 transform group-hover:scale-110 transition-transform text-6xl">📉</div>
                     <p className={`text-sm font-bold uppercase tracking-wider mb-2 ${summary?.lowStockProductsCount > 0 ? 'text-red-500' : 'text-gray-400'}`}>Stock ပြတ်လုနီးပါး</p>
                     <h3 className={`text-2xl font-black ${summary?.lowStockProductsCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>

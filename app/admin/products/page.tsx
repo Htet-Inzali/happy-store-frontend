@@ -64,9 +64,18 @@ export default function AdminProductListPage() {
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+    // 🌟 Dashboard ၏ "Stock ပြတ်လုနီးပါး" card မှ လာလျှင် (?lowstock=1) stock နည်းသော ပစ္စည်းများသာ ပြသည်
+    const [lowStockOnly, setLowStockOnly] = useState(false);
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get("lowstock") === "1") {
+            setLowStockOnly(true);
+        }
+    }, []);
+
     const filteredProducts = products.filter((p: any) =>
-        (p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase()))
+        ((p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+        (!lowStockOnly || (p.totalStock ?? 0) <= 5)
     );
 
     const handleExcelUploadAndPreview = async (e: any) => {
@@ -257,6 +266,16 @@ export default function AdminProductListPage() {
                     </button>
                 </div>
             </div>
+
+            {/* 🌟 Low-stock filter ဖွင့်ထားကြောင်း ပြသော banner */}
+            {lowStockOnly && (
+                <div className="mb-4 flex items-center justify-between bg-red-50 border border-red-200 rounded-2xl px-5 py-3">
+                    <p className="text-sm font-bold text-red-600">📉 Stock ပြတ်လုနီးပါး (လက်ကျန် ၅ ခုနှင့်အောက်) ပစ္စည်းများသာ ပြနေသည် — {filteredProducts.length} မျိုး</p>
+                    <button onClick={() => setLowStockOnly(false)} className="text-xs font-black text-red-500 hover:text-red-700 bg-white border border-red-200 rounded-lg px-3 py-1.5">
+                        ✕ အားလုံးပြန်ပြ
+                    </button>
+                </div>
+            )}
 
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left border-collapse">

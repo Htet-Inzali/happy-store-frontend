@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import {
@@ -104,53 +105,57 @@ export default function AdminDashboardPage() {
 
             {/* Top Summary Cards (Loading ပြနေချိန် ဝါးသွားအောင် opacity လျှော့ထားသည်) */}
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}>
-                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                <Link href="/admin/orders" className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer">
                     <div className="absolute top-0 right-0 p-4 opacity-10 transform group-hover:scale-110 transition-transform text-6xl">💰</div>
                     <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">ရောင်းရငွေ ({dateFilter})</p>
                     <h3 className="text-2xl font-black text-gray-900">{Number(summary?.todayRevenue || 0).toLocaleString()} ₫</h3>
-                </div>
+                    <p className="text-[11px] text-blue-500 font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Orders ကြည့်ရန် →</p>
+                </Link>
 
-                <div className="bg-linear-to-br from-green-500 to-green-600 p-6 rounded-3xl border border-green-400 shadow-md shadow-green-200 text-white relative overflow-hidden group">
+                <Link href="/admin/orders" className="bg-linear-to-br from-green-500 to-green-600 p-6 rounded-3xl border border-green-400 shadow-md shadow-green-200 text-white relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer">
                     <div className="absolute top-0 right-0 p-4 opacity-20 transform group-hover:scale-110 transition-transform text-6xl">📈</div>
                     <p className="text-sm font-bold text-green-100 uppercase tracking-wider mb-2">အမြတ်ငွေ ({dateFilter})</p>
                     <h3 className="text-2xl font-black">{Number(summary?.todayProfit || 0).toLocaleString()} ₫</h3>
-                </div>
+                    <p className="text-[11px] text-green-50 font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Orders ကြည့်ရန် →</p>
+                </Link>
 
-                <div className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group ${summary?.pendingPreordersCount > 0 ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100'}`}>
+                <Link href="/admin/orders" className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer ${summary?.pendingPreordersCount > 0 ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100'}`}>
                     <div className="absolute top-0 right-0 p-4 opacity-10 transform group-hover:scale-110 transition-transform text-6xl">⏳</div>
                     <p className={`text-sm font-bold uppercase tracking-wider mb-2 ${summary?.pendingPreordersCount > 0 ? 'text-orange-500' : 'text-gray-400'}`}>ဖြည့်တင်းရန် Preorder</p>
                     <h3 className={`text-2xl font-black ${summary?.pendingPreordersCount > 0 ? 'text-orange-600' : 'text-gray-900'}`}>
                         {summary?.pendingPreordersCount || 0} ခု
                     </h3>
-                </div>
+                    <p className="text-[11px] text-orange-500 font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Preorder ဖြည့်ရန် →</p>
+                </Link>
 
-                <div className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group ${summary?.lowStockProductsCount > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
+                <Link href="/admin/products" className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden group hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer ${summary?.lowStockProductsCount > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
                     <div className="absolute top-0 right-0 p-4 opacity-10 transform group-hover:scale-110 transition-transform text-6xl">📉</div>
                     <p className={`text-sm font-bold uppercase tracking-wider mb-2 ${summary?.lowStockProductsCount > 0 ? 'text-red-500' : 'text-gray-400'}`}>Stock ပြတ်လုနီးပါး</p>
                     <h3 className={`text-2xl font-black ${summary?.lowStockProductsCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>
                         {summary?.lowStockProductsCount || 0} မျိုး
                     </h3>
-                </div>
+                    <p className="text-[11px] text-red-500 font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Stock ဖြည့်ရန် →</p>
+                </Link>
             </div>
 
             {/* 🌟 ဒုတိယ Metric Cards Row */}
             <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 transition-opacity ${loading ? 'opacity-50' : 'opacity-100'}`}>
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <Link href="/admin/orders" className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">🧾 Order အရေအတွက်</p>
                     <h3 className="text-xl font-black text-gray-900">{summary?.totalOrdersCount || 0} ခု</h3>
-                </div>
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                </Link>
+                <Link href="/admin/orders" className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">📦 ရောင်းရ ပစ္စည်း</p>
                     <h3 className="text-xl font-black text-gray-900">{summary?.totalItemsSold || 0} ခု</h3>
-                </div>
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                </Link>
+                <Link href="/admin/orders" className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">📊 ပျမ်းမျှ Order</p>
                     <h3 className="text-xl font-black text-gray-900">{fmtVND(summary?.averageOrderValueVND)} ₫</h3>
-                </div>
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                </Link>
+                <Link href="/admin/orders" className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">💹 အမြတ် Margin</p>
                     <h3 className="text-xl font-black text-gray-900">{Number(summary?.profitMarginPercent || 0)}%</h3>
-                </div>
+                </Link>
             </div>
 
             {/* 🌟 Sales Trend Chart + ဘေး panel */}
@@ -199,11 +204,11 @@ export default function AdminDashboardPage() {
                             <span className="font-black">{fmtVND(summary?.walkInRevenue)} ₫</span>
                         </div>
                     </div>
-                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                    <Link href="/admin/products" className="block bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer">
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">🏬 လက်ကျန် Stock တန်ဖိုး</p>
                         <h3 className="text-2xl font-black text-gray-900">{fmtVND(summary?.inventoryValueVND)} ₫</h3>
-                        <p className="text-xs text-gray-400 mt-2">ရောင်းနေသော ပစ္စည်း {summary?.totalActiveProducts || 0} မျိုး</p>
-                    </div>
+                        <p className="text-xs text-gray-400 mt-2">ရောင်းနေသော ပစ္စည်း {summary?.totalActiveProducts || 0} မျိုး →</p>
+                    </Link>
                 </div>
             </div>
 

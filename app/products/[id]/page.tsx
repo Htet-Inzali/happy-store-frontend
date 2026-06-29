@@ -63,7 +63,11 @@ export default function ProductDetailPage() {
               <span className="text-3xl font-black text-blue-600">
                 {Number(product.currentPriceVND || 0).toLocaleString()} VND
               </span>
-                            <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-600 uppercase">In Stock</span>
+                            {product.totalStock > 0 ? (
+                                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-600 uppercase">In Stock ({product.totalStock})</span>
+                            ) : (
+                                <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-600 uppercase">Preorder</span>
+                            )}
                         </div>
 
                         <div className="mt-8 border-t border-gray-100 pt-8">
@@ -76,9 +80,9 @@ export default function ProductDetailPage() {
                         <div className="mt-10 flex space-x-4">
                             <button
                                 onClick={() => addToCart(product)}
-                                className="flex-1 rounded-2xl bg-blue-600 py-4 text-base font-black text-white shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
+                                className={`flex-1 rounded-2xl py-4 text-base font-black text-white shadow-xl active:scale-95 transition-all ${product.totalStock > 0 ? "bg-blue-600 shadow-blue-100 hover:bg-blue-700" : "bg-orange-500 shadow-orange-100 hover:bg-orange-600"}`}
                             >
-                                ခြင်းတောင်းထဲထည့်မည်
+                                {product.totalStock > 0 ? "ခြင်းတောင်းထဲထည့်မည်" : "ကြိုတင်မှာယူမည် (Preorder)"}
                             </button>
                             <Link href="/cart" className="flex items-center justify-center rounded-2xl bg-gray-100 px-6 py-4 text-xl">🛒</Link>
                         </div>

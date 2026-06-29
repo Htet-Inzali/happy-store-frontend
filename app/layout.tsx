@@ -6,7 +6,6 @@ import { CartProvider } from "@/context/CartContext";
 // 🌟 Error ပြင်ဆင်ချက်
 import Navbar from "@/app/components/Navbar";
 import { Toaster } from "react-hot-toast";
-import {WishlistProvider} from "@/context/WishlistContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body className={inter.className}>
         <AuthProvider>
             <CartProvider>
-                <WishlistProvider>
-                    <Navbar />
-                        {children}
-                        <Toaster position="top-center" />
-                 </WishlistProvider>
+                <Navbar />
+                {children}
+                <Toaster position="top-center" />
             </CartProvider>
         </AuthProvider>
         </body>

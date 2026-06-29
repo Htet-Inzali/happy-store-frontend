@@ -12,6 +12,8 @@ export default function AdminOrderListPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [filter, setFilter] = useState<"online" | "walkin" | "preorder" | "all">("online");
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("ALL");
 
     // 🌟 Dashboard card မှ လာသောအခါ URL (?tab=preorder) အတိုင်း tab ဖွင့်ပေးသည်
     useEffect(() => {
@@ -26,12 +28,19 @@ export default function AdminOrderListPage() {
     const onlineCount = orders.filter((o) => !isWalkIn(o)).length;
     const walkinCount = orders.filter((o) => isWalkIn(o)).length;
     const preorderCount = orders.filter(isPreorder).length;
-    const filteredOrders = orders.filter((o) =>
-        filter === "all" ? true
+    const q = search.trim().toLowerCase();
+    const filteredOrders = orders.filter((o) => {
+        const tabOk = filter === "all" ? true
             : filter === "walkin" ? isWalkIn(o)
                 : filter === "preorder" ? isPreorder(o)
-                    : !isWalkIn(o)
-    );
+                    : !isWalkIn(o);
+        const statusOk = statusFilter === "ALL" || o.status === statusFilter;
+        const searchOk = !q
+            || (o.orderNumber || "").toLowerCase().includes(q)
+            || (o.customerName || "").toLowerCase().includes(q)
+            || (o.customerPhone || "").toLowerCase().includes(q);
+        return tabOk && statusOk && searchOk;
+    });
 
     const fetchOrders = async () => {
         try {
@@ -136,6 +145,35 @@ export default function AdminOrderListPage() {
                         </span>
                     </button>
                 ))}
+            </div>
+
+            {/* 🌟 Search + Status filter (Admin အလွယ်တကူ ရှာရန်) */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="🔍 Order နံပါတ် / ဖောက်သည်အမည် / ဖုန်း နဲ့ ရှာရန်..."
+                    className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                />
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-4 py-3 rounded-2xl border border-gray-200 font-bold text-gray-700 outline-none focus:border-blue-500 bg-white"
+                >
+                    <option value="ALL">အခြေအနေ — အားလုံး</option>
+                    <option value="PENDING">အသစ်ဝင်ထားသည်</option>
+                    <option value="APPROVED">အတည်ပြုပြီး</option>
+                    <option value="SHIPPING">ပို့ဆောင်နေဆဲ</option>
+                    <option value="DELIVERED">ပို့ဆောင်ပြီး</option>
+                    <option value="PREORDER_PENDING">Preorder</option>
+                    <option value="CANCELLED">ပယ်ဖျက်ထားသည်</option>
+                </select>
+                {(search || statusFilter !== "ALL") && (
+                    <button onClick={() => { setSearch(""); setStatusFilter("ALL"); }} className="px-4 py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 whitespace-nowrap">
+                        ✕ ရှင်း
+                    </button>
+                )}
             </div>
 
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">

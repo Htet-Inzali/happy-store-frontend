@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import React from "react"; // 🌟 Admin စစ်ရန် Import လုပ်ထားသည်
 
 export default function ProductCard({ product }: { product: any }) {
     const { addToCart } = useCart();
-    const { toggleWishlist, isInWishlist } = useWishlist();
     const { user } = useAuth(); // 🌟 User Data ဆွဲယူခြင်း
 
     const isAdmin = user?.role === "ADMIN";
@@ -44,19 +42,6 @@ export default function ProductCard({ product }: { product: any }) {
                     </span>
                 )}
             </div>
-
-            {/* 🌟 Admin မဟုတ်မှသာ အသည်းပုံ (Wishlist) ကို ပြမည် */}
-            {!isAdmin && (
-                <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        toggleWishlist(product);
-                    }}
-                    className="absolute top-5 right-5 z-20 flex items-center justify-center w-9 h-9 bg-white/90 rounded-full shadow-md hover:scale-110 transition-transform"
-                >
-                    {isInWishlist(product.id) ? "❤️" : "🤍"}
-                </button>
-            )}
 
             <Link href={`/products/${product.id}`} className="flex-1 mt-2">
                 <div className="w-full aspect-square bg-gray-50 rounded-xl overflow-hidden relative">

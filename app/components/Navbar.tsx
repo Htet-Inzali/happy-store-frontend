@@ -61,7 +61,6 @@ export default function Navbar() {
                             {!isAdmin && user && (
                                 <>
                                     <Link href="/orders" className={`text-sm ${activeLink("/orders")}`}>ဝယ်ယူမှု မှတ်တမ်းများ</Link>
-                                    <Link href="/wishlist" className={`text-sm ${activeLink("/wishlist")}`}>Wishlist</Link>
                                 </>
                             )}
                         </div>

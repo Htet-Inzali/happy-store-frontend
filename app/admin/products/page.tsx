@@ -28,7 +28,7 @@ export default function AdminProductListPage() {
     const [selectedBatch, setSelectedBatch] = useState<any>(null);
 
     const [productForm, setProductForm] = useState({
-        name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "",
+        name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: "",
         initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6.6"
     });
 
@@ -38,7 +38,7 @@ export default function AdminProductListPage() {
     });
 
     const [editForm, setEditForm] = useState({
-        name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: ""
+        name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: ""
     });
 
     const [editBatchForm, setEditBatchForm] = useState({
@@ -149,7 +149,7 @@ export default function AdminProductListPage() {
                 toast.success("ပစ္စည်းနှင့် Stock သိမ်းဆည်းပြီးပါပြီ။");
                 await fetchProducts();
                 setIsAddProductModalOpen(false);
-                setProductForm({ name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6.6" });
+                setProductForm({ name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: "", initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6.6" });
             }
         } catch (error: any) { toast.error("သိမ်းဆည်းရာတွင် အမှားရှိပါသည်။"); }
         finally { setIsSubmitting(false); }
@@ -222,7 +222,7 @@ export default function AdminProductListPage() {
 
     const openEditModal = (product: any) => {
         setSelectedProduct(product);
-        setEditForm({ name: product.name, description: product.description, weightGram: product.weightGram, currentPriceVND: product.currentPriceVND, sku: product.sku, imageUrl: product.imageUrl });
+        setEditForm({ name: product.name, description: product.description, weightGram: product.weightGram, currentPriceVND: product.currentPriceVND, sku: product.sku, imageUrl: product.imageUrl, category: product.category || "" });
         setIsEditProductModalOpen(true);
     };
 
@@ -409,6 +409,7 @@ export default function AdminProductListPage() {
                                     </div>
                                     <div className="flex-1 space-y-3">
                                         <input required type="text" placeholder="ပစ္စည်းအမည် *" value={productForm.name} onChange={e => setProductForm((prev: any) => ({ ...prev, name: e.target.value }))} className="w-full p-2.5 rounded-xl border bg-white focus:ring-2 focus:ring-yellow-400 outline-none" />
+                                        <input type="text" placeholder="အမျိုးအစား Category (ဥပမာ — ပုဇွန်ခြောက်)" value={productForm.category} onChange={e => setProductForm((prev: any) => ({ ...prev, category: e.target.value }))} className="w-full p-2.5 mt-2 rounded-xl border bg-white focus:ring-2 focus:ring-yellow-400 outline-none" />
                                         <input required type="text" placeholder="SKU Code *" value={productForm.sku} onChange={e => setProductForm((prev: any) => ({ ...prev, sku: e.target.value }))} className="w-full p-2.5 rounded-xl border bg-white focus:ring-2 focus:ring-yellow-400 outline-none" />
                                     </div>
                                 </div>
@@ -460,6 +461,7 @@ export default function AdminProductListPage() {
                                 </div>
                                 <div className="flex-1 space-y-3">
                                     <input required type="text" placeholder="ပစ္စည်းအမည် *" value={editForm.name} onChange={e => setEditForm((prev: any) => ({ ...prev, name: e.target.value }))} className="w-full p-2.5 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none" />
+                                    <input type="text" placeholder="အမျိုးအစား Category" value={editForm.category} onChange={e => setEditForm((prev: any) => ({ ...prev, category: e.target.value }))} className="w-full p-2.5 mt-2 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none" />
                                     <input required type="text" placeholder="SKU Code *" value={editForm.sku} onChange={e => setEditForm((prev: any) => ({ ...prev, sku: e.target.value }))} className="w-full p-2.5 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none" />
                                 </div>
                             </div>

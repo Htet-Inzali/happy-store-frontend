@@ -13,6 +13,7 @@ export default function HomePage() {
 
   // 🌟 Search အတွက် State အသစ်
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
 
   useEffect(() => {
     let cancelled = false;
@@ -62,11 +63,19 @@ export default function HomePage() {
     };
   }, []);
 
-  // 🌟 ရှာဖွေထားသော စာသားနဲ့ ကိုက်ညီတဲ့ ပစ္စည်းတွေကို စစ်ထုတ်ခြင်း (နာမည် သို့မဟုတ် SKU)
-  const filteredProducts = products.filter((product: any) =>
-      (product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // 🌟 Category စာရင်း (ပစ္စည်းများထဲမှ ထုတ်ယူ)
+  const categories = Array.from(
+      new Set(products.map((p: any) => p.category).filter((c: any) => c && String(c).trim() !== ""))
+  ) as string[];
+
+  // 🌟 ရှာဖွေထားသော စာသား + category နဲ့ ကိုက်ညီတဲ့ ပစ္စည်းတွေကို စစ်ထုတ်ခြင်း
+  const filteredProducts = products.filter((product: any) => {
+    const matchSearch =
+        (product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchCategory = selectedCategory === "ALL" || product.category === selectedCategory;
+    return matchSearch && matchCategory;
+  });
 
   if (loading)
     return (
@@ -117,6 +126,27 @@ export default function HomePage() {
             />
           </div>
         </div>
+
+        {/* 🌟 Category Filter Chips */}
+        {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              <button
+                  onClick={() => setSelectedCategory("ALL")}
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${selectedCategory === "ALL" ? "bg-blue-600 text-white shadow-md" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"}`}
+              >
+                အားလုံး
+              </button>
+              {categories.map((cat) => (
+                  <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${selectedCategory === cat ? "bg-blue-600 text-white shadow-md" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"}`}
+                  >
+                    {cat}
+                  </button>
+              ))}
+            </div>
+        )}
 
         {/* 🌟 Product Grid Section */}
         {filteredProducts.length > 0 ? (

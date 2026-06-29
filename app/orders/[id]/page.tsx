@@ -4,28 +4,48 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/axios";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function OrderDetailPage() {
     const { id } = useParams();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [cancelling, setCancelling] = useState(false);
+
+    const fetchOrderDetail = async () => {
+        try {
+            const response = await api.get(`/orders/my-orders`);
+            if (response.data.success) {
+                const found = response.data.data.find((o: any) => o.id === Number(id));
+                setOrder(found);
+            }
+        } catch (error) {
+            console.error("Order Detail Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchOrderDetail = async () => {
-            try {
-                const response = await api.get(`/orders/my-orders`);
-                if (response.data.success) {
-                    const found = response.data.data.find((o: any) => o.id === Number(id));
-                    setOrder(found);
-                }
-            } catch (error) {
-                console.error("Order Detail Error:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         if (id) fetchOrderDetail();
     }, [id]);
+
+    const handleCancel = async () => {
+        if (!confirm("ဤအော်ဒါကို ပယ်ဖျက်မှာ သေချာပါသလား?")) return;
+        setCancelling(true);
+        const toastId = toast.loading("ပယ်ဖျက်နေပါသည်...");
+        try {
+            const res = await api.post(`/orders/${order.id}/cancel`);
+            if (res.data.success) {
+                toast.success("အော်ဒါကို ပယ်ဖျက်ပြီးပါပြီ။", { id: toastId });
+                fetchOrderDetail();
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "ပယ်ဖျက်၍ မရပါ။", { id: toastId });
+        } finally {
+            setCancelling(false);
+        }
+    };
 
     if (loading) return <div className="text-center py-20 font-bold text-blue-600">ခဏစောင့်ပေးပါ...</div>;
     if (!order) return <div className="text-center py-20 text-red-500 font-bold">အော်ဒါအချက်အလက် ရှာမတွေ့ပါ။</div>;
@@ -89,6 +109,26 @@ export default function OrderDetailPage() {
                         <span className="text-2xl font-black text-blue-600">{Number(order.totalAmountVND || 0).toLocaleString()} ₫</span>
                     </div>
                 </div>
+
+                {/* 🌟 PENDING / Preorder ဖြစ်မှသာ Customer က ပယ်ဖျက်နိုင်သည် */}
+                {(order.status === 'PENDING' || order.status === 'PREORDER_PENDING') && (
+                    <div className="mt-8 pt-6 border-t border-gray-100">
+                        <button
+                            onClick={handleCancel}
+                            disabled={cancelling}
+                            className="w-full py-3 rounded-2xl bg-red-50 text-red-600 font-black border border-red-200 hover:bg-red-600 hover:text-white transition-all disabled:opacity-50"
+                        >
+                            {cancelling ? "ပယ်ဖျက်နေပါသည်..." : "✕ အော်ဒါ ပယ်ဖျက်မည်"}
+                        </button>
+                        <p className="text-xs text-gray-400 text-center mt-2">အတည်ပြုပြီး/ပို့ဆောင်ပြီးပါက ပယ်ဖျက်၍ မရတော့ပါ။</p>
+                    </div>
+                )}
+
+                {order.status === 'CANCELLED' && (
+                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <span className="px-4 py-2 rounded-full text-sm font-black bg-red-100 text-red-600">ဤအော်ဒါကို ပယ်ဖျက်ပြီးဖြစ်သည်</span>
+                    </div>
+                )}
             </div>
         </div>
     );

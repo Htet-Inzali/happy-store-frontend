@@ -93,6 +93,24 @@ export default function AdminOrderListPage() {
         }
     };
 
+    const handlePaymentToggle = async () => {
+        if (!selectedOrder) return;
+        const newStatus = selectedOrder.paymentStatus === "PAID" ? "UNPAID" : "PAID";
+        setIsUpdating(true);
+        try {
+            const res = await api.put(`/admin/orders/${selectedOrder.id}/payment?status=${newStatus}`);
+            if (res.data.success) {
+                toast.success(newStatus === "PAID" ? "ငွေရရှိပြီး အဖြစ် မှတ်လိုက်ပါပြီ။" : "ငွေမရသေး အဖြစ် ပြန်ပြောင်းလိုက်ပါပြီ။");
+                setSelectedOrder({ ...selectedOrder, paymentStatus: newStatus });
+                fetchOrders();
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "ငွေပေးချေမှု ပြောင်းရာတွင် အမှားရှိပါသည်။");
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     const handleFulfillPreorder = async () => {
         if (!selectedOrder) return;
         setIsUpdating(true);
@@ -215,9 +233,16 @@ export default function AdminOrderListPage() {
                                             </span>
                                     </td>
                                     <td className="p-4 text-center">
+                                        <div className="flex flex-col items-center gap-1">
                                             <span className={`px-4 py-1.5 rounded-full text-xs font-black tracking-wide ${statusInfo.style}`}>
                                                 {statusInfo.text}
                                             </span>
+                                            {o.status !== "CANCELLED" && (
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${o.paymentStatus === "PAID" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"}`}>
+                                                    {o.paymentStatus === "PAID" ? "💵 ငွေရပြီး" : "⏳ ငွေမရသေး"}
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="p-4 pr-6 text-right">
                                         <button
@@ -299,6 +324,23 @@ export default function AdminOrderListPage() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* 🌟 ငွေပေးချေမှု (Payment) — COD ငွေရ/မရ */}
+                        <div className="mb-6 flex items-center justify-between bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                            <div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">ငွေပေးချေမှု</p>
+                                <span className={`px-3 py-1 rounded-full text-sm font-black ${selectedOrder.paymentStatus === "PAID" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                                    {selectedOrder.paymentStatus === "PAID" ? "✅ ငွေရရှိပြီး" : "⏳ ငွေမရသေး"}
+                                </span>
+                            </div>
+                            <button
+                                onClick={handlePaymentToggle}
+                                disabled={isUpdating}
+                                className={`px-5 py-2.5 rounded-xl font-black text-sm transition-all ${selectedOrder.paymentStatus === "PAID" ? "bg-gray-100 text-gray-600 hover:bg-gray-200" : "bg-green-600 text-white hover:bg-green-700 shadow-md shadow-green-200"}`}
+                            >
+                                {selectedOrder.paymentStatus === "PAID" ? "↩ ငွေမရသေး ပြန်ပြောင်း" : "💵 ငွေရရှိပြီး မှတ်မည်"}
+                            </button>
                         </div>
 
                         <div>

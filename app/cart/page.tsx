@@ -44,11 +44,17 @@ export default function CartPage() {
         return `${backendUrl}${url}`;
     };
 
-    const inStockItems = cartItems.filter(item => item.totalStock > 0);
-    const preorderItems = cartItems.filter(item => item.totalStock <= 0);
+    // 🌟 ပစ္စည်းတစ်ခုချင်းစီအတွက် ချက်ချင်းရနိုင်သည့် အရေအတွက် နှင့် preorder အရေအတွက် (partial split)
+    // ဥပမာ — ၁၀ ဝယ်ပြီး လက်ကျန် ၆ ဆို → ၆ ချက်ချင်း၊ ၄ preorder
+    const inStockQtyOf = (item: any) => Math.min(item.quantity, Math.max(0, item.totalStock || 0));
+    const preorderQtyOf = (item: any) => item.quantity - inStockQtyOf(item);
 
-    const inStockTotal = inStockItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * item.quantity), 0);
-    const preorderTotal = preorderItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * item.quantity), 0);
+    // in-stock section: ချက်ချင်းရနိုင်သည့် အပိုင်းရှိသော item (partial ပါ)၊ preorder section: လုံးဝ stock မရှိသော item သာ
+    const inStockItems = cartItems.filter(item => inStockQtyOf(item) > 0);
+    const preorderItems = cartItems.filter(item => inStockQtyOf(item) === 0 && preorderQtyOf(item) > 0);
+
+    const inStockTotal = cartItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * inStockQtyOf(item)), 0);
+    const preorderTotal = cartItems.reduce((sum, item) => sum + (Number(item.currentPriceVND) * preorderQtyOf(item)), 0);
 
     // 🌟 ပို့ဆောင်ခ — total ထဲ မပေါင်းတော့ဘဲ note အဖြစ်သာ ပြသည် (COD တွင် ပို့ချိန်မှ သီးသန့်ကောက်ခံ)
     // COD + 500,000 ထက်ကျော် → Free၊ မဟုတ်ရင် "Add-on Delivery Charge" note
@@ -108,21 +114,28 @@ export default function CartPage() {
 
                             <button
                                 onClick={() => {
-                                    if (item.totalStock > 0 && item.quantity >= item.totalStock) {
-                                        toast.error(
-                                            `လက်ကျန် ${item.totalStock} ခုသာ ရှိပါတော့သည်။ ကျန်အရေအတွက်ကို Preorder တင်လိုပါက Admin သို့ ဆက်သွယ်ပေးပါ။`,
-                                            { duration: 5000, icon: '⚠️' }
-                                        );
-                                    } else {
-                                        updateQuantity(item.id, item.quantity + 1);
+                                    // 🌟 လက်ကျန်ကျော် ဝယ်နိုင်သည် — ကျော်သွားသည့် အပိုင်းကို Preorder အဖြစ် တွက်မည်
+                                    const willExceed = item.totalStock > 0 && item.quantity + 1 > item.totalStock;
+                                    updateQuantity(item.id, item.quantity + 1);
+                                    if (willExceed) {
+                                        toast(`လက်ကျန် ${item.totalStock} ကျော်ပါပြီ — ပိုသည့်အပိုင်းကို Preorder အဖြစ် တင်ပါမည်။`, { icon: "⏳", duration: 3000 });
                                     }
                                 }}
-                                className={`px-3 py-1 font-black transition-colors ${item.totalStock > 0 && item.quantity >= item.totalStock ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-blue-600'}`}
+                                className="px-3 py-1 font-black text-gray-500 hover:text-blue-600 transition-colors"
                             >
                                 +
                             </button>
 
                         </div>
+
+                        {/* 🌟 Partial split note — ချက်ချင်း အပိုင်း + Preorder အပိုင်း */}
+                        {inStockQtyOf(item) > 0 && preorderQtyOf(item) > 0 && (
+                            <p className="mt-2 text-xs font-bold">
+                                <span className="text-green-600">✅ {inStockQtyOf(item)} ခု ချက်ချင်း</span>
+                                <span className="text-gray-300 mx-1">·</span>
+                                <span className="text-orange-500">⏳ {preorderQtyOf(item)} ခု Preorder</span>
+                            </p>
+                        )}
                     </div>
                     <button onClick={() => removeFromCart(item.id)} className="p-2 text-red-300 hover:text-red-500 transition-colors">✕</button>
                 </div>

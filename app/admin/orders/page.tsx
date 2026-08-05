@@ -93,6 +93,59 @@ export default function AdminOrderListPage() {
         }
     };
 
+    const printReceipt = (order: any) => {
+        const fmt = (n: any) => Number(n || 0).toLocaleString();
+        const subtotal = (order.items || []).reduce((s: number, i: any) => s + Number(i.price) * Number(i.quantity), 0);
+        const isPickup = (order.shippingAddress || "").includes("ဆိုင်တွင်လာယူ") || order.orderNumber?.startsWith("POS-");
+        const rows = (order.items || []).map((i: any) => `
+            <tr>
+              <td>${i.productName || ""}</td>
+              <td class="c">${i.quantity}</td>
+              <td class="r">${fmt(i.price)}</td>
+              <td class="r">${fmt(Number(i.price) * Number(i.quantity))}</td>
+            </tr>`).join("");
+        const paid = order.paymentStatus === "PAID";
+        const html = `<!doctype html><html><head><meta charset="utf-8"><title>${order.orderNumber}</title>
+          <style>
+            * { font-family: -apple-system, 'Myanmar Text', sans-serif; }
+            body { padding: 24px; color: #111; max-width: 380px; margin: auto; }
+            h1 { text-align:center; margin:0; font-size:20px; }
+            .sub { text-align:center; color:#666; font-size:12px; margin:4px 0 16px; }
+            .meta { font-size:12px; line-height:1.7; border-top:1px dashed #999; border-bottom:1px dashed #999; padding:10px 0; }
+            table { width:100%; border-collapse:collapse; margin:12px 0; font-size:12px; }
+            th { text-align:left; border-bottom:1px solid #333; padding:6px 2px; }
+            td { padding:5px 2px; border-bottom:1px solid #eee; }
+            .c { text-align:center; } .r { text-align:right; }
+            .tot { display:flex; justify-content:space-between; font-size:13px; padding:3px 0; }
+            .grand { font-weight:800; font-size:16px; border-top:2px solid #333; padding-top:8px; margin-top:6px; }
+            .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:800; }
+            .note { font-size:11px; color:#666; text-align:center; margin-top:14px; }
+          </style></head><body>
+            <h1>HAPPY STORE</h1>
+            <div class="sub">Burmese Products</div>
+            <div class="meta">
+              <div><b>Order:</b> ${order.orderNumber || ""}</div>
+              <div><b>နေ့စွဲ:</b> ${new Date(order.orderDate).toLocaleString()}</div>
+              <div><b>ဝယ်ယူသူ:</b> ${order.customerName || ""} ${order.customerPhone ? "(" + order.customerPhone + ")" : ""}</div>
+              <div><b>ငွေပေးချေမှု:</b> <span class="badge" style="background:${paid ? "#dcfce7" : "#fee2e2"};color:${paid ? "#16a34a" : "#dc2626"}">${paid ? "ငွေရရှိပြီး" : "ငွေမရသေး"}</span></div>
+            </div>
+            <table>
+              <thead><tr><th>ပစ္စည်း</th><th class="c">အရေ</th><th class="r">ဈေး</th><th class="r">ပေါင်း</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+            <div class="tot"><span>ပစ္စည်းဖိုး (Subtotal)</span><span>${fmt(subtotal)} ₫</span></div>
+            <div class="tot"><span>ပို့ဆောင်ခ</span><span>${isPickup ? "—" : "သီးသန့် ကောက်ခံမည်"}</span></div>
+            <div class="tot grand"><span>စုစုပေါင်း</span><span>${fmt(order.totalAmountVND)} ₫</span></div>
+            <div class="note">ကျေးဇူးတင်ပါသည် 🙏<br/>${isPickup ? "" : "ပို့ဆောင်ခကို ပို့ချိန်တွင် သီးသန့် ကောက်ခံပါမည်။"}</div>
+          </body></html>`;
+        const w = window.open("", "_blank", "width=420,height=640");
+        if (!w) { toast.error("Popup ကို ခွင့်ပြုပေးပါ (browser popup blocker)"); return; }
+        w.document.write(html);
+        w.document.close();
+        w.focus();
+        setTimeout(() => w.print(), 300);
+    };
+
     const handlePaymentToggle = async () => {
         if (!selectedOrder) return;
         const newStatus = selectedOrder.paymentStatus === "PAID" ? "UNPAID" : "PAID";
@@ -273,9 +326,17 @@ export default function AdminOrderListPage() {
                             ✕
                         </button>
 
-                        <div className="mb-6 border-b border-gray-100 pb-4">
-                            <h2 className="text-2xl font-black text-gray-900">အော်ဒါ: <span className="text-blue-600">{selectedOrder.orderNumber}</span></h2>
-                            <p className="text-gray-500 font-medium mt-1">ဝယ်ယူသူ: {selectedOrder.customerName} ({selectedOrder.customerPhone})</p>
+                        <div className="mb-6 border-b border-gray-100 pb-4 flex justify-between items-start">
+                            <div>
+                                <h2 className="text-2xl font-black text-gray-900">အော်ဒါ: <span className="text-blue-600">{selectedOrder.orderNumber}</span></h2>
+                                <p className="text-gray-500 font-medium mt-1">ဝယ်ယူသူ: {selectedOrder.customerName} ({selectedOrder.customerPhone})</p>
+                            </div>
+                            <button
+                                onClick={() => printReceipt(selectedOrder)}
+                                className="shrink-0 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-black hover:bg-black transition-all"
+                            >
+                                🖨️ ဘောက်ချာ
+                            </button>
                         </div>
 
                         <div className="mb-8">

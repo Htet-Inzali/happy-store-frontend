@@ -28,6 +28,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "Walk-in Sale", path: "/admin/walk-in", icon: "🛍️" },
         { name: "Orders", path: "/admin/orders", icon: "🛒️" },
         { name: "Products", path: "/admin/products", icon: "📦" },
+        { name: "Customers", path: "/admin/customers", icon: "👥" },
+        { name: "Sales Report", path: "/admin/reports", icon: "📈" },
         { name: "Settings", path: "/admin/settings", icon: "⚙️" },
     ];
 

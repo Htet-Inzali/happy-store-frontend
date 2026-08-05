@@ -64,6 +64,30 @@ export default function AdminProductListPage() {
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+    // 🌟 Bulk price update
+    const [isBulkPriceOpen, setIsBulkPriceOpen] = useState(false);
+    const [bulkPercent, setBulkPercent] = useState("");
+    const [bulkCategory, setBulkCategory] = useState("");
+    const [bulkSubmitting, setBulkSubmitting] = useState(false);
+
+    const handleBulkPrice = async () => {
+        const pct = Number(bulkPercent);
+        if (!pct || isNaN(pct)) { toast.error("ရာခိုင်နှုန်း (ဥပမာ 5 သို့ -10) ထည့်ပါ"); return; }
+        if (!confirm(`ပစ္စည်း${bulkCategory ? ` (${bulkCategory})` : "အားလုံး"}၏ ဈေးကို ${pct > 0 ? "+" : ""}${pct}% ချိန်ညှိမှာ သေချာပါသလား?`)) return;
+        setBulkSubmitting(true);
+        const toastId = toast.loading("ဈေးများ ချိန်ညှိနေသည်...");
+        try {
+            const res = await api.put(`/admin/inventory/products/bulk-price`, null, { params: { percent: pct, category: bulkCategory || undefined } });
+            if (res.data.success) {
+                toast.success(res.data.message || "ပြီးပါပြီ", { id: toastId });
+                setIsBulkPriceOpen(false); setBulkPercent(""); setBulkCategory("");
+                await fetchProducts();
+            }
+        } catch (e: any) {
+            toast.error(e.response?.data?.message || "မအောင်မြင်ပါ", { id: toastId });
+        } finally { setBulkSubmitting(false); }
+    };
+
     // 🌟 Dashboard ၏ "Stock ပြတ်လုနီးပါး" card မှ လာလျှင် (?lowstock=1) stock နည်းသော ပစ္စည်းများသာ ပြသည်
     const [lowStockOnly, setLowStockOnly] = useState(false);
     useEffect(() => {
@@ -261,6 +285,9 @@ export default function AdminProductListPage() {
                         + Excel ဖြင့်တင်မည်
                         <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleExcelUploadAndPreview} />
                     </label>
+                    <button onClick={() => setIsBulkPriceOpen(true)} className="px-5 py-3 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 border border-blue-200 transition-all whitespace-nowrap">
+                        💱 ဈေး တစ်ပြိုင်နက်
+                    </button>
                     <button onClick={() => setIsAddProductModalOpen(true)} className="px-5 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black shadow-lg transition-all whitespace-nowrap">
                         + တစ်ခုချင်းတင်မည်
                     </button>
@@ -274,6 +301,40 @@ export default function AdminProductListPage() {
                     <button onClick={() => setLowStockOnly(false)} className="text-xs font-black text-red-500 hover:text-red-700 bg-white border border-red-200 rounded-lg px-3 py-1.5">
                         ✕ အားလုံးပြန်ပြ
                     </button>
+                </div>
+            )}
+
+            {/* 🌟 Bulk Price Modal */}
+            {isBulkPriceOpen && (
+                <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+                        <h2 className="text-xl font-black text-gray-900 mb-2">💱 ဈေး တစ်ပြိုင်နက် ချိန်ညှိ</h2>
+                        <p className="text-sm text-gray-500 mb-6">ရောင်းဈေးများကို ရာခိုင်နှုန်းဖြင့် တစ်ပြိုင်နက် တိုး/လျှော့ (ငွေလဲနှုန်း ပြောင်းချိန် အသုံးဝင်)</p>
+
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">ရာခိုင်နှုန်း (%)</label>
+                        <input type="number" value={bulkPercent} onChange={(e) => setBulkPercent(e.target.value)}
+                            placeholder="ဥပမာ — 5 (တိုး) သို့ -10 (လျှော့)"
+                            className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-blue-500 mb-4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">အမျိုးအစား (optional — မထည့်ရင် အားလုံး)</label>
+                        <select value={bulkCategory} onChange={(e) => setBulkCategory(e.target.value)}
+                            className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-blue-500 mb-2 bg-white">
+                            <option value="">— ပစ္စည်းအားလုံး —</option>
+                            {Array.from(new Set(products.map((p: any) => p.category).filter((c: any) => c))).map((c: any) => (
+                                <option key={c} value={c}>{c}</option>
+                            ))}
+                        </select>
+                        {bulkPercent && !isNaN(Number(bulkPercent)) && (
+                            <p className="text-xs text-gray-500 mb-4">ဥပမာ — 100,000 ₫ → <b className="text-blue-600">{Math.round(100000 * (1 + Number(bulkPercent) / 100)).toLocaleString()} ₫</b></p>
+                        )}
+
+                        <div className="flex gap-3 mt-4">
+                            <button onClick={() => setIsBulkPriceOpen(false)} disabled={bulkSubmitting} className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200">မလုပ်တော့ပါ</button>
+                            <button onClick={handleBulkPrice} disabled={bulkSubmitting} className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 disabled:opacity-50">
+                                {bulkSubmitting ? "ချိန်ညှိနေသည်..." : "ချိန်ညှိမည်"}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

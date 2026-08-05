@@ -93,6 +93,27 @@ export default function AdminOrderListPage() {
         }
     };
 
+    // 🌟 Row-level quick actions (modal မဖွင့်ဘဲ)
+    const quickPayment = async (o: any) => {
+        setIsUpdating(true);
+        try {
+            const res = await api.put(`/admin/orders/${o.id}/payment?status=PAID`);
+            if (res.data.success) { toast.success("ငွေရရှိပြီး မှတ်လိုက်ပါပြီ။"); fetchOrders(); }
+        } catch (e: any) {
+            toast.error(e.response?.data?.message || "မအောင်မြင်ပါ");
+        } finally { setIsUpdating(false); }
+    };
+
+    const quickDeliver = async (o: any) => {
+        setIsUpdating(true);
+        try {
+            const res = await api.put(`/admin/orders/${o.id}/status?status=DELIVERED`);
+            if (res.data.success) { toast.success("ပို့ဆောင်ပြီး မှတ်လိုက်ပါပြီ။"); fetchOrders(); }
+        } catch (e: any) {
+            toast.error(e.response?.data?.message || "မအောင်မြင်ပါ");
+        } finally { setIsUpdating(false); }
+    };
+
     const printReceipt = (order: any) => {
         const fmt = (n: any) => Number(n || 0).toLocaleString();
         const subtotal = (order.items || []).reduce((s: number, i: any) => s + Number(i.price) * Number(i.quantity), 0);
@@ -298,15 +319,26 @@ export default function AdminOrderListPage() {
                                         </div>
                                     </td>
                                     <td className="p-4 pr-6 text-right">
-                                        <button
-                                            onClick={() => openOrderDetails(o)}
-                                            className="p-2.5 bg-gray-900 text-white hover:bg-gray-800 rounded-xl transition-colors shadow-sm inline-flex items-center justify-center"
-                                            title="အသေးစိတ် / ပြင်မည်"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                            </svg>
-                                        </button>
+                                        <div className="inline-flex items-center gap-2">
+                                            {/* 🌟 Quick actions — modal မဖွင့်ဘဲ တိုက်ရိုက် */}
+                                            {o.status !== "CANCELLED" && o.paymentStatus !== "PAID" && (
+                                                <button onClick={() => quickPayment(o)} disabled={isUpdating}
+                                                    className="p-2.5 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-colors" title="ငွေရရှိပြီး မှတ်မည်">💵</button>
+                                            )}
+                                            {["PENDING", "APPROVED", "SHIPPING"].includes(o.status) && (
+                                                <button onClick={() => quickDeliver(o)} disabled={isUpdating}
+                                                    className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-colors" title="ပို့ဆောင်ပြီး မှတ်မည်">✅</button>
+                                            )}
+                                            <button
+                                                onClick={() => openOrderDetails(o)}
+                                                className="p-2.5 bg-gray-900 text-white hover:bg-gray-800 rounded-xl transition-colors shadow-sm inline-flex items-center justify-center"
+                                                title="အသေးစိတ် / ပြင်မည်"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             );

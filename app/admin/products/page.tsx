@@ -22,19 +22,19 @@ export default function AdminProductListPage() {
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [previewData, setPreviewData] = useState<any[]>([]);
     // 🌟 Preview တွင် အမြတ်ကို အစမ်းတွက်ကြည့်နိုင်ရန် State သစ်
-    const [previewExchangeRate, setPreviewExchangeRate] = useState("6.6");
+    const [previewExchangeRate, setPreviewExchangeRate] = useState("6");
 
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [selectedBatch, setSelectedBatch] = useState<any>(null);
 
     const [productForm, setProductForm] = useState({
         name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: "",
-        initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6.6"
+        initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6"
     });
 
     const [stockForm, setStockForm] = useState({
         initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000",
-        newSalePriceVND: "", arrivalDate: new Date().toISOString().split('T')[0], expiryDate: "", modalExchangeRate: "6.6"
+        newSalePriceVND: "", arrivalDate: new Date().toISOString().split('T')[0], expiryDate: "", modalExchangeRate: "6"
     });
 
     const [editForm, setEditForm] = useState({
@@ -42,7 +42,7 @@ export default function AdminProductListPage() {
     });
 
     const [editBatchForm, setEditBatchForm] = useState({
-        quantity: "", originalPriceMMK: "", kiloRateMMK: "", salePriceVND: "", expiryDate: "", modalExchangeRate: "6.6"
+        quantity: "", originalPriceMMK: "", kiloRateMMK: "", salePriceVND: "", expiryDate: "", modalExchangeRate: "6"
     });
 
     const fetchProducts = useCallback(async () => {
@@ -173,7 +173,7 @@ export default function AdminProductListPage() {
                 toast.success("ပစ္စည်းနှင့် Stock သိမ်းဆည်းပြီးပါပြီ။");
                 await fetchProducts();
                 setIsAddProductModalOpen(false);
-                setProductForm({ name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: "", initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6.6" });
+                setProductForm({ name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: "", initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6" });
             }
         } catch (error: any) { toast.error("သိမ်းဆည်းရာတွင် အမှားရှိပါသည်။"); }
         finally { setIsSubmitting(false); }
@@ -252,7 +252,7 @@ export default function AdminProductListPage() {
 
     const openEditBatchModal = (batch: any) => {
         setSelectedBatch(batch);
-        setEditBatchForm({ quantity: batch.remainingQuantity, originalPriceMMK: batch.originalPriceMMK, kiloRateMMK: batch.kiloRateMMK, salePriceVND: batch.salePriceVND, expiryDate: batch.expiryDate || "", modalExchangeRate: "6.6" });
+        setEditBatchForm({ quantity: batch.remainingQuantity, originalPriceMMK: batch.originalPriceMMK, kiloRateMMK: batch.kiloRateMMK, salePriceVND: batch.salePriceVND, expiryDate: batch.expiryDate || "", modalExchangeRate: "6" });
         setIsEditBatchModalOpen(true);
     };
 

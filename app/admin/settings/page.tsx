@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 export default function AdminSettingsPage() {
     // 🌟 အစ်ကို့ Backend မှ Key များအတိုင်း ချိတ်ဆက်ထားသည်
     const [settings, setSettings] = useState({
-        "EXCHANGE_RATE": 1,
+        "EXCHANGE_RATE": 6,
         "PROFIT_PERCENT": 20,
         "DELIVERY_FEE_VND": 30000,
         "FREE_DELIVERY_THRESHOLD": 500000

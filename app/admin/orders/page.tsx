@@ -78,11 +78,14 @@ export default function AdminOrderListPage() {
 
     const handleStatusUpdate = async (newStatus: string) => {
         if (!selectedOrder) return;
+        // 🌟 ပယ်ဖျက် (customer မယူတော့/ပြန်အမ်း) — stock ပြန်ထည့်ပြီး အမြတ်ထဲက ဖယ်မည်
+        if (newStatus === "CANCELLED" &&
+            !confirm("ဤအော်ဒါကို ပယ်ဖျက်မှာ သေချာပါသလား?\n\n• Stock ကို ပြန်ပေါင်းထည့်ပါမည်\n• ဝင်ငွေ/အမြတ်ထဲမှ ဖယ်ရှားပါမည်")) return;
         setIsUpdating(true);
         try {
             const res = await api.put(`/admin/orders/${selectedOrder.id}/status?status=${newStatus}`);
             if (res.data.success) {
-                toast.success("အော်ဒါ အခြေအနေကို ပြောင်းလဲလိုက်ပါပြီ။");
+                toast.success(newStatus === "CANCELLED" ? "ပယ်ဖျက်ပြီး Stock ပြန်ထည့်ပြီးပါပြီ။" : "အော်ဒါ အခြေအနေကို ပြောင်းလဲလိုက်ပါပြီ။");
                 fetchOrders();
                 setIsModalOpen(false);
             }
@@ -476,9 +479,10 @@ export default function AdminOrderListPage() {
                                     <button
                                         onClick={() => handleStatusUpdate("CANCELLED")}
                                         disabled={isUpdating || selectedOrder.status === "CANCELLED"}
+                                        title="Customer မယူတော့ပါက — Stock ပြန်ထည့်ပြီး အမြတ်ထဲက ဖယ်မည်"
                                         className={`py-3 px-2 rounded-xl font-bold text-sm transition-all ${selectedOrder.status === "CANCELLED" ? 'bg-red-600 text-white ring-2 ring-red-300 ring-offset-2' : 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-100'}`}
                                     >
-                                        ပယ်ဖျက်မည်
+                                        ပယ်ဖျက် / ပြန်အမ်း
                                     </button>
                                 </div>
                             )}

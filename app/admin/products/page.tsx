@@ -509,8 +509,11 @@ export default function AdminProductListPage() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <input required type="number" placeholder="ဝယ်ရင်းဈေး (MMK) *" value={productForm.originalPriceMMK} onChange={e => setProductForm((prev: any) => ({ ...prev, originalPriceMMK: e.target.value }))} className="p-3 rounded-xl border bg-white outline-none" />
-                                    <input required type="number" placeholder="သယ်ယူခ (MMK) *" value={productForm.kiloRateMMK} onChange={e => setProductForm((prev: any) => ({ ...prev, kiloRateMMK: e.target.value }))} className="p-3 rounded-xl border bg-white outline-none" />
+                                    <input required type="number" placeholder="Kilo Rate — 1kg နှုန်း (MMK) *" value={productForm.kiloRateMMK} onChange={e => setProductForm((prev: any) => ({ ...prev, kiloRateMMK: e.target.value }))} className="p-3 rounded-xl border bg-white outline-none" />
                                 </div>
+                                {Number(productForm.weightGram) > 0 && Number(productForm.kiloRateMMK) > 0 && (
+                                    <p className="text-xs text-gray-500 -mt-2">🚚 ဒီပစ္စည်း ({productForm.weightGram}g) အတွက် သယ်ယူခ = <b className="text-blue-600">{Math.round((Number(productForm.weightGram) / 1000) * Number(productForm.kiloRateMMK)).toLocaleString()} MMK</b></p>
+                                )}
                                 <div className="pt-2">
                                     <label className="text-[10px] font-black text-gray-500 block mb-1">Exchange Rate (1 MMK = ? VND)</label>
                                     <input required type="number" step="0.01" value={productForm.modalExchangeRate} onChange={e => setProductForm((prev: any) => ({ ...prev, modalExchangeRate: e.target.value }))} className="w-full p-3 rounded-xl border bg-white outline-none font-black text-gray-600 text-sm" />
@@ -579,8 +582,11 @@ export default function AdminProductListPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <input required type="number" placeholder="ဝယ်ရင်းဈေး (MMK) *" value={stockForm.originalPriceMMK} onChange={e => setStockForm((prev: any) => ({ ...prev, originalPriceMMK: e.target.value }))} className="p-3 rounded-xl bg-blue-50 border-blue-100 outline-none" />
-                                <input required type="number" placeholder="သယ်ယူခ (MMK) *" value={stockForm.kiloRateMMK} onChange={e => setStockForm((prev: any) => ({ ...prev, kiloRateMMK: e.target.value }))} className="p-3 rounded-xl bg-blue-50 border-blue-100 outline-none" />
+                                <input required type="number" placeholder="Kilo Rate — 1kg နှုန်း (MMK) *" value={stockForm.kiloRateMMK} onChange={e => setStockForm((prev: any) => ({ ...prev, kiloRateMMK: e.target.value }))} className="p-3 rounded-xl bg-blue-50 border-blue-100 outline-none" />
                             </div>
+                            {Number(selectedProduct?.weightGram) > 0 && Number(stockForm.kiloRateMMK) > 0 && (
+                                <p className="text-xs text-gray-500">🚚 {selectedProduct.name} ({selectedProduct.weightGram}g) အတွက် သယ်ယူခ = <b className="text-blue-600">{Math.round((Number(selectedProduct.weightGram) / 1000) * Number(stockForm.kiloRateMMK)).toLocaleString()} MMK</b></p>
+                            )}
                             <div className="grid grid-cols-2 gap-4 items-end">
                                 <input type="number" placeholder="ရောင်းဈေးအသစ် (VND)" value={stockForm.newSalePriceVND} onChange={e => setStockForm((prev: any) => ({ ...prev, newSalePriceVND: e.target.value }))} className="p-3 rounded-xl bg-green-50 border-green-100 font-black text-green-700 outline-none" />
                                 <div>

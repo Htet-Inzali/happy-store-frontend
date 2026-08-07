@@ -125,6 +125,17 @@ export default function AdminProductListPage() {
         e.target.value = null;
     };
 
+    // 🌟 Preview row ကို edit လုပ်ရန်
+    const updatePreviewRow = (i: number, field: string, value: any) => {
+        setPreviewData((prev: any[]) => prev.map((row, idx) => {
+            if (idx !== i) return row;
+            const updated = { ...row, [field]: value };
+            // ရောင်းဈေး (currentPriceVND) နှင့် salePriceVND ကို sync
+            if (field === "currentPriceVND") updated.salePriceVND = value;
+            return updated;
+        }));
+    };
+
     const handleConfirmBulkSave = async () => {
         setIsSubmitting(true);
         const toastId = toast.loading("ပစ္စည်းများ သိမ်းဆည်းနေပါသည်...");
@@ -389,7 +400,7 @@ export default function AdminProductListPage() {
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className="text-2xl font-black text-gray-900 mb-2">Excel မှတ်တမ်းများကို စစ်ဆေးပါ (Preview)</h2>
-                                <p className="text-gray-500 text-sm">ရောင်းဈေးမှာ သင် Excel တွင် ထည့်ထားသော ဈေးဖြစ်သည်။ ငွေလဲနှုန်းကို <b>အရင်း (MMK→VND) ပြောင်းရန်သာ</b> သုံးပါသည်။</p>
+                                <p className="text-gray-500 text-sm">✏️ <b>အကွက်များကို တိုက်ရိုက် ပြင်နိုင်ပါသည်</b> (အမည်၊ ဈေး၊ အရေအတွက်...)။ ငွေလဲနှုန်းကို အရင်း (MMK→VND) ပြောင်း၍ အမြတ်ကြည့်ရန်သာ သုံးသည်။</p>
                             </div>
                             <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center space-x-3">
                                 <label className="text-xs font-bold text-gray-500">Rate (1 MMK = ? VND)</label>
@@ -404,7 +415,7 @@ export default function AdminProductListPage() {
                                     <th className="p-3">အမည်</th>
                                     <th className="p-3">အလေးချိန်</th>
                                     <th className="p-3 text-right">ဝယ်ဈေး<br/>(MMK)</th>
-                                    <th className="p-3 text-right">သယ်ယူခ<br/>(MMK)</th>
+                                    <th className="p-3 text-right">Kilo Rate<br/>(MMK)</th>
                                     <th className="p-3 text-right bg-orange-50 text-orange-700">စုစုပေါင်း အရင်း<br/>(MMK → VND)</th>
                                     <th className="p-3 text-center">Qty</th>
                                     <th className="p-3 text-right bg-blue-50 text-blue-700">ရောင်းဈေး<br/>(VND)</th>
@@ -421,19 +432,30 @@ export default function AdminProductListPage() {
                                     const totalCostVND = totalCostMMK * rate;
                                     const salePrice = Number(d.currentPriceVND) || 0; // user ထည့်သော ရောင်းဈေး
                                     const profit = salePrice - totalCostVND;
+                                    const cellInput = "w-full bg-transparent outline-none focus:bg-white focus:ring-1 focus:ring-blue-300 rounded px-1 py-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
                                     return (
                                         <tr key={i} className="hover:bg-green-50/30">
-                                            <td className="p-3 font-bold text-gray-800 text-sm">{d.name}</td>
-                                            <td className="p-3 text-xs text-gray-500">{d.weightGram}g</td>
-                                            <td className="p-3 text-right text-xs text-gray-600">{origMMK.toLocaleString()}</td>
-                                            <td className="p-3 text-right text-xs text-gray-600">{Math.round(kiloCostMMK).toLocaleString()}</td>
+                                            <td className="p-2 font-bold text-gray-800 text-sm min-w-[130px]">
+                                                <input value={d.name || ""} onChange={(e) => updatePreviewRow(i, "name", e.target.value)} className={cellInput} />
+                                            </td>
+                                            <td className="p-2 text-xs text-gray-600 w-16">
+                                                <input type="number" value={d.weightGram ?? ""} onChange={(e) => updatePreviewRow(i, "weightGram", Number(e.target.value))} className={cellInput + " text-right"} />
+                                            </td>
+                                            <td className="p-2 text-xs text-gray-600 w-20">
+                                                <input type="number" value={d.originalPriceMMK ?? ""} onChange={(e) => updatePreviewRow(i, "originalPriceMMK", Number(e.target.value))} className={cellInput + " text-right"} />
+                                            </td>
+                                            <td className="p-2 text-xs text-gray-600 w-20">
+                                                <input type="number" value={d.kiloRateMMK ?? ""} onChange={(e) => updatePreviewRow(i, "kiloRateMMK", Number(e.target.value))} className={cellInput + " text-right"} />
+                                            </td>
                                             <td className="p-3 text-right bg-orange-50/40">
                                                 <p className="font-bold text-gray-800 text-sm">{Math.round(totalCostMMK).toLocaleString()} Ks</p>
                                                 <p className="text-[11px] text-orange-600 font-bold">= {Math.round(totalCostVND).toLocaleString()} ₫</p>
                                             </td>
-                                            <td className="p-3 text-center font-bold text-green-600 text-sm">{d.initialQuantity}</td>
-                                            <td className="p-3 text-right font-black text-blue-600 text-sm bg-blue-50/40">
-                                                {salePrice > 0 ? `${salePrice.toLocaleString()} ₫` : <span className="text-red-400 text-xs">မထည့်ရသေး</span>}
+                                            <td className="p-2 text-center w-14">
+                                                <input type="number" value={d.initialQuantity ?? ""} onChange={(e) => updatePreviewRow(i, "initialQuantity", Number(e.target.value))} className={cellInput + " text-center font-bold text-green-600"} />
+                                            </td>
+                                            <td className="p-2 text-right bg-blue-50/40 w-24">
+                                                <input type="number" placeholder="ဈေးထည့်" value={d.currentPriceVND ?? ""} onChange={(e) => updatePreviewRow(i, "currentPriceVND", Number(e.target.value))} className={cellInput + " text-right font-black text-blue-600"} />
                                             </td>
                                             <td className={`p-3 text-right font-black text-sm bg-yellow-50/30 ${profit > 0 ? 'text-green-600' : 'text-red-500'}`}>
                                                 {profit > 0 ? '+' : ''}{Math.round(profit).toLocaleString()} ₫

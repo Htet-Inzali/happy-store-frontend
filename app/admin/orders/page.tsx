@@ -259,7 +259,6 @@ export default function AdminOrderListPage() {
                     <option value="ALL">အခြေအနေ — အားလုံး</option>
                     <option value="PENDING">အသစ်ဝင်ထားသည်</option>
                     <option value="APPROVED">အတည်ပြုပြီး</option>
-                    <option value="SHIPPING">ပို့ဆောင်နေဆဲ</option>
                     <option value="DELIVERED">ပို့ဆောင်ပြီး</option>
                     <option value="PREORDER_PENDING">Preorder</option>
                     <option value="CANCELLED">ပယ်ဖျက်ထားသည်</option>
@@ -328,7 +327,7 @@ export default function AdminOrderListPage() {
                                                 <button onClick={() => quickPayment(o)} disabled={isUpdating}
                                                     className="p-2.5 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-colors" title="ငွေရရှိပြီး မှတ်မည်">💵</button>
                                             )}
-                                            {["PENDING", "APPROVED", "SHIPPING"].includes(o.status) && (
+                                            {["PENDING", "APPROVED"].includes(o.status) && (
                                                 <button onClick={() => quickDeliver(o)} disabled={isUpdating}
                                                     className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-colors" title="ပို့ဆောင်ပြီး မှတ်မည်">✅</button>
                                             )}
@@ -454,20 +453,13 @@ export default function AdminOrderListPage() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <button
                                         onClick={() => handleStatusUpdate("APPROVED")}
                                         disabled={isUpdating || selectedOrder.status === "APPROVED"}
                                         className={`py-3 px-2 rounded-xl font-bold text-sm transition-all ${selectedOrder.status === "APPROVED" ? 'bg-blue-600 text-white ring-2 ring-blue-300 ring-offset-2' : 'bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-700'}`}
                                     >
                                         အတည်ပြုမည်
-                                    </button>
-                                    <button
-                                        onClick={() => handleStatusUpdate("SHIPPING")}
-                                        disabled={isUpdating || selectedOrder.status === "SHIPPING"}
-                                        className={`py-3 px-2 rounded-xl font-bold text-sm transition-all ${selectedOrder.status === "SHIPPING" ? 'bg-purple-600 text-white ring-2 ring-purple-300 ring-offset-2' : 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-700'}`}
-                                    >
-                                        ပို့ဆောင်နေသည်
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate("DELIVERED")}

@@ -8,8 +8,6 @@ export default function AdminSettingsPage() {
     // 🌟 အစ်ကို့ Backend မှ Key များအတိုင်း ချိတ်ဆက်ထားသည်
     const [settings, setSettings] = useState({
         "EXCHANGE_RATE": 6,
-        "PROFIT_PERCENT": 20,
-        "DELIVERY_FEE_VND": 30000,
         "FREE_DELIVERY_THRESHOLD": 500000
     });
     const [loading, setLoading] = useState(true);
@@ -51,36 +49,22 @@ export default function AdminSettingsPage() {
 
             <form onSubmit={handleSave} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
 
-                {/* ဈေးနှုန်း တွက်ချက်မှု ဆက်တင်များ */}
+                {/* ငွေလဲလှယ်နှုန်း — အရင်း (MMK) ကို VND ပြောင်း၍ အမြတ်တွက်ရန်သာ သုံးသည် */}
                 <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
                     <label className="block text-sm font-black text-blue-800 uppercase mb-2">ငွေလဲလှယ်နှုန်း (Exchange Rate)</label>
+                    <p className="text-xs text-blue-600/70 mb-2">အရင်း (MMK) ကို VND ပြောင်း၍ <b>အမြတ်တွက်ရန်သာ</b> သုံးသည်။ ရောင်းဈေးက သင် ကိုယ်တိုင် သတ်မှတ်တာမို့ ဤနှုန်းနှင့် မဆိုင်ပါ။</p>
                     <input
                         type="number" step="0.01" required
                         value={settings["EXCHANGE_RATE"]}
                         onChange={(e) => setSettings({...settings, "EXCHANGE_RATE": Number(e.target.value)})}
-                        className="w-full p-4 rounded-xl mb-6 bg-white border border-gray-200 font-black text-lg outline-none"
-                    />
-
-                    <label className="block text-sm font-black text-blue-800 uppercase mb-2">အမြတ် ရာခိုင်နှုန်း (Profit Percent %)</label>
-                    <input
-                        type="number" step="0.01" required
-                        value={settings["PROFIT_PERCENT"]}
-                        onChange={(e) => setSettings({...settings, "PROFIT_PERCENT": Number(e.target.value)})}
                         className="w-full p-4 rounded-xl bg-white border border-gray-200 font-black text-lg outline-none"
                     />
                 </div>
 
-                {/* ပို့ဆောင်ခ ဆက်တင်များ */}
+                {/* ပို့ဆောင်ခ အခမဲ့ ကန့်သတ်ပမာဏ — ဤပမာဏထက် ကျော်ရင် "အခမဲ့"၊ မဟုတ်ရင် "Add-on" note ပြသည် */}
                 <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                    <label className="block text-sm font-black text-gray-800 uppercase mb-2">ပုံမှန် ပို့ဆောင်ခ (VND)</label>
-                    <input
-                        type="number" required
-                        value={settings["DELIVERY_FEE_VND"]}
-                        onChange={(e) => setSettings({...settings, "DELIVERY_FEE_VND": Number(e.target.value)})}
-                        className="w-full p-4 rounded-xl mb-6 bg-white border border-gray-200 font-black text-lg outline-none"
-                    />
-
                     <label className="block text-sm font-black text-gray-800 uppercase mb-2">ပို့ဆောင်ခ အခမဲ့ ကန့်သတ်ပမာဏ (VND)</label>
+                    <p className="text-xs text-gray-500 mb-2">ဤပမာဏထက် ကျော်ဝယ်ရင် "အခမဲ့"၊ မဟုတ်ရင် "ပို့ချိန်တွင် သီးသန့်ကောက်ခံ" ဟု ပြသည်။ ပို့ဆောင်ခကို order total ထဲ မပေါင်းပါ။</p>
                     <input
                         type="number" required
                         value={settings["FREE_DELIVERY_THRESHOLD"]}

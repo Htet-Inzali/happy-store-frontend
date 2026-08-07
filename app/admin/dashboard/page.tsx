@@ -13,8 +13,20 @@ export default function AdminDashboardPage() {
     const [expiringBatches, setExpiringBatches] = useState<any[]>([]);
     const [topProducts, setTopProducts] = useState<any[]>([]);
     const [salesTrend, setSalesTrend] = useState<any[]>([]);
+    const [salesRows, setSalesRows] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [dateFilter, setDateFilter] = useState("TODAY");
+
+    // dateFilter (TODAY/WEEK/MONTH) → sales report date range
+    const dateRange = () => {
+        const now = new Date();
+        const end = new Date(now); end.setHours(23, 59, 59);
+        const start = new Date(now); start.setHours(0, 0, 0, 0);
+        if (dateFilter === "WEEK") start.setDate(start.getDate() - 6);
+        else if (dateFilter === "MONTH") start.setDate(1);
+        const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        return { startDate: `${iso(start)}T00:00:00`, endDate: `${iso(end)}T23:59:59` };
+    };
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -22,16 +34,18 @@ export default function AdminDashboardPage() {
             try {
                 // 🌟 Filter ကို Backend သို့ ပို့၍ Data လှမ်းယူခြင်း
                 const trendFilter = dateFilter === "MONTH" ? "MONTH" : "WEEK";
-                const [summaryRes, alertsRes, topRes, trendRes] = await Promise.all([
+                const [summaryRes, alertsRes, topRes, trendRes, salesRes] = await Promise.all([
                     api.get(`/admin/dashboard/summary?filter=${dateFilter}`),
                     api.get("/admin/dashboard/alerts/expiring"),
                     api.get("/admin/dashboard/top-products"),
                     api.get(`/admin/dashboard/sales-trend?filter=${trendFilter}`),
+                    api.get("/admin/orders/reports/sales", { params: dateRange() }),
                 ]);
 
                 if (summaryRes.data.success) setSummary(summaryRes.data.data);
                 if (alertsRes.data.success) setExpiringBatches(alertsRes.data.data);
                 if (topRes.data.success) setTopProducts(topRes.data.data);
+                if (salesRes.data.success) setSalesRows(salesRes.data.data);
                 if (trendRes.data.success) {
                     setSalesTrend(
                         trendRes.data.data.map((p: any) => ({
@@ -53,6 +67,19 @@ export default function AdminDashboardPage() {
     }, [dateFilter]); // 🌟 Date ပြောင်းတိုင်း Data အသစ်ပြန်ဆွဲမည်
 
     const fmtVND = (n: any) => Number(n || 0).toLocaleString();
+
+    // 🌟 Sales report — ပစ္စည်းအလိုက် စုစည်း (qty, ဝင်ငွေ, အမြတ်)
+    const salesByProduct = (() => {
+        const map: Record<string, { name: string; qty: number; sale: number; profit: number }> = {};
+        for (const r of salesRows) {
+            const k = r.productName || "—";
+            if (!map[k]) map[k] = { name: k, qty: 0, sale: 0, profit: 0 };
+            map[k].qty += Number(r.quantity || 0);
+            map[k].sale += Number(r.totalSaleVND || 0);
+            map[k].profit += Number(r.totalProfitVND || 0);
+        }
+        return Object.values(map).sort((a, b) => b.profit - a.profit);
+    })();
 
     // 🌟 Excel File အစစ်ကို Backend မှ Download ဆွဲမည့် Function
     const handleDownloadExcel = async () => {
@@ -298,6 +325,40 @@ export default function AdminDashboardPage() {
                     )}
                 </div>
 
+            </div>
+
+            {/* 🌟 အရောင်း Report — ပစ္စည်းအလိုက် (Dashboard ထဲ ပေါင်းထားသည်) */}
+            <div className="mt-8 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                <h2 className="text-xl font-black text-gray-900 mb-1 flex items-center">
+                    <span className="text-2xl mr-2">📈</span> အရောင်း Report — ပစ္စည်းအလိုက် ({dateFilter})
+                </h2>
+                <p className="text-sm text-gray-500 mb-5">အထက်က ကာလ (Today/Week/Month) အတိုင်း ပစ္စည်းတစ်ခုချင်း ဝင်ငွေ/အမြတ်</p>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[520px]">
+                        <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-xs tracking-widest border-b border-gray-100">
+                        <tr>
+                            <th className="p-3 pl-4">ပစ္စည်း</th>
+                            <th className="p-3 text-center">ရောင်းရ</th>
+                            <th className="p-3 text-right">ဝင်ငွေ</th>
+                            <th className="p-3 pr-4 text-right">အမြတ်</th>
+                        </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                        {salesByProduct.length === 0 ? (
+                            <tr><td colSpan={4} className="p-6 text-center text-gray-500 font-bold">ဤကာလအတွင်း အရောင်း မရှိသေးပါ။</td></tr>
+                        ) : (
+                            salesByProduct.map((p, i) => (
+                                <tr key={i} className="hover:bg-gray-50/50">
+                                    <td className="p-3 pl-4 font-bold text-gray-900">{p.name}</td>
+                                    <td className="p-3 text-center font-bold text-blue-600">{p.qty}</td>
+                                    <td className="p-3 text-right text-gray-700">{fmtVND(p.sale)} ₫</td>
+                                    <td className={`p-3 pr-4 text-right font-black ${p.profit >= 0 ? "text-green-600" : "text-red-500"}`}>{fmtVND(p.profit)} ₫</td>
+                                </tr>
+                            ))
+                        )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

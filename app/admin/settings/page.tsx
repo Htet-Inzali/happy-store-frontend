@@ -8,6 +8,7 @@ export default function AdminSettingsPage() {
     // 🌟 အစ်ကို့ Backend မှ Key များအတိုင်း ချိတ်ဆက်ထားသည်
     const [settings, setSettings] = useState({
         "EXCHANGE_RATE": 6,
+        "DEFAULT_KILO_RATE": 20000,
         "FREE_DELIVERY_THRESHOLD": 500000
     });
     const [loading, setLoading] = useState(true);
@@ -57,6 +58,18 @@ export default function AdminSettingsPage() {
                         type="number" step="0.01" required
                         value={settings["EXCHANGE_RATE"]}
                         onChange={(e) => setSettings({...settings, "EXCHANGE_RATE": Number(e.target.value)})}
+                        className="w-full p-4 rounded-xl bg-white border border-gray-200 font-black text-lg outline-none"
+                    />
+                </div>
+
+                {/* Default Kilo Rate — ပစ္စည်းအသစ်/stock ထည့်ချိန် သယ်ယူခ (1kg နှုန်း) ကို ကြိုဖြည့်ပေးရန် */}
+                <div className="bg-amber-50/60 p-6 rounded-2xl border border-amber-100">
+                    <label className="block text-sm font-black text-amber-800 uppercase mb-2">ပုံမှန် Kilo Rate — 1kg သယ်ယူခ (MMK)</label>
+                    <p className="text-xs text-amber-700/70 mb-2">ပစ္စည်းအသစ်/stock ထည့်ချိန် ဤနှုန်းကို ကြိုဖြည့်ပေးမည် (လိုအပ်ရင် ပြင်လို့ရ)။ ပစ္စည်းရဲ့ gram အလိုက် အလိုအလျောက် တွက်ပါမည်။</p>
+                    <input
+                        type="number" required
+                        value={settings["DEFAULT_KILO_RATE"]}
+                        onChange={(e) => setSettings({...settings, "DEFAULT_KILO_RATE": Number(e.target.value)})}
                         className="w-full p-4 rounded-xl bg-white border border-gray-200 font-black text-lg outline-none"
                     />
                 </div>

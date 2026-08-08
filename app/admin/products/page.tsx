@@ -64,6 +64,21 @@ export default function AdminProductListPage() {
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+    // 🌟 Settings မှ default Kilo Rate ဆွဲယူ၍ form များတွင် ကြိုဖြည့်ရန်
+    const [defaultKiloRate, setDefaultKiloRate] = useState("20000");
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await api.get("/settings/all");
+                const dk = res.data?.data?.DEFAULT_KILO_RATE;
+                if (dk) {
+                    setDefaultKiloRate(String(dk));
+                    setProductForm((prev: any) => ({ ...prev, kiloRateMMK: String(dk) }));
+                }
+            } catch { /* setting မရှိရင် default 20000 */ }
+        })();
+    }, []);
+
     // 🌟 Bulk price update
     const [isBulkPriceOpen, setIsBulkPriceOpen] = useState(false);
     const [bulkPercent, setBulkPercent] = useState("");
@@ -184,7 +199,7 @@ export default function AdminProductListPage() {
                 toast.success("ပစ္စည်းနှင့် Stock သိမ်းဆည်းပြီးပါပြီ။");
                 await fetchProducts();
                 setIsAddProductModalOpen(false);
-                setProductForm({ name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: "", initialQuantity: "", originalPriceMMK: "", kiloRateMMK: "25000", expiryDate: "", modalExchangeRate: "6" });
+                setProductForm({ name: "", description: "", weightGram: "", currentPriceVND: "", sku: "", imageUrl: "", category: "", initialQuantity: "", originalPriceMMK: "", kiloRateMMK: defaultKiloRate, expiryDate: "", modalExchangeRate: "6" });
             }
         } catch (error: any) { toast.error("သိမ်းဆည်းရာတွင် အမှားရှိပါသည်။"); }
         finally { setIsSubmitting(false); }
@@ -299,7 +314,7 @@ export default function AdminProductListPage() {
                     <button onClick={() => setIsBulkPriceOpen(true)} className="px-5 py-3 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 border border-blue-200 transition-all whitespace-nowrap">
                         💱 ဈေး တစ်ပြိုင်နက်
                     </button>
-                    <button onClick={() => setIsAddProductModalOpen(true)} className="px-5 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black shadow-lg transition-all whitespace-nowrap">
+                    <button onClick={() => { setProductForm((prev: any) => ({ ...prev, kiloRateMMK: defaultKiloRate })); setIsAddProductModalOpen(true); }} className="px-5 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black shadow-lg transition-all whitespace-nowrap">
                         + တစ်ခုချင်းတင်မည်
                     </button>
                 </div>
@@ -377,7 +392,7 @@ export default function AdminProductListPage() {
                             </td>
                             <td className="p-5 pr-6 text-right space-x-2">
                                 <button onClick={() => { setSelectedProduct(p); setIsViewBatchesModalOpen(true); }} className="p-2.5 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors" title="Batches စာရင်း">📋</button>
-                                <button onClick={() => { setSelectedProduct(p); setIsAddStockModalOpen(true); }} className="px-4 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl hover:bg-green-600 hover:text-white transition-colors border border-green-100 text-sm">+ Add Stock</button>
+                                <button onClick={() => { setSelectedProduct(p); setStockForm((prev: any) => ({ ...prev, kiloRateMMK: defaultKiloRate })); setIsAddStockModalOpen(true); }} className="px-4 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl hover:bg-green-600 hover:text-white transition-colors border border-green-100 text-sm">+ Add Stock</button>
                                 <button onClick={() => openEditModal(p)} className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-colors" title="ပြင်ဆင်မည်">✏️</button>
                                 <button onClick={() => handleDelete(p.id)} className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-colors" title="ဖျက်မည်">🗑️</button>
                             </td>

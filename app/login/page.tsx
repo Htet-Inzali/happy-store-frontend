@@ -9,28 +9,34 @@ import toast from "react-hot-toast";
 export default function LoginPage() {
     const [credential, setCredential] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [waking, setWaking] = useState(false); // 🌟 cold start (ဆာဗာနိုးနေတုန်း) ပြရန်
     const router = useRouter();
     const { login } = useAuth();
 
-    // 🌟 ပြင်ဆင်ချက်: TypeScript Error မတက်စေရန် React.SyntheticEvent ကို ပြောင်းသုံးထားပါသည်
     const handleLogin = async (e: React.SyntheticEvent) => {
         e.preventDefault();
+        setIsLoading(true);
+        // ၈ စက္ကန့်ထက်ကြာရင် ဆာဗာ cold start ဖြစ်နေကြောင်း ပြသည်
+        const wakeTimer = setTimeout(() => setWaking(true), 8000);
         try {
-            const response = await api.post("/auth/login", { credential, password });
+            const response = await api.post("/auth/login", { credential, password }, { timeout: 90000 });
             if (response.data.success) {
                 login(response.data.data.token);
                 toast.success("Login အောင်မြင်ပါသည်။");
-
-                // Admin လား User လား စစ်ဆေးပြီး လမ်းကြောင်းခွဲပို့မည်
                 const userRole = response.data.data.role || response.data.data.user?.role;
                 if (userRole === "ADMIN") {
-                    router.push("/admin/orders"); // Admin ဆိုလျှင် Admin Panel သို့
+                    router.push("/admin/orders");
                 } else {
-                    router.push("/"); // User ဆိုလျှင် Home Page သို့
+                    router.push("/");
                 }
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "အကောင့် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်။");
+        } finally {
+            clearTimeout(wakeTimer);
+            setWaking(false);
+            setIsLoading(false);
         }
     };
 
@@ -40,10 +46,16 @@ export default function LoginPage() {
                 <h2 className="text-3xl font-black text-center text-gray-900 mb-8">Login ဝင်ရန်</h2>
                 <form onSubmit={handleLogin} className="space-y-5">
                     <input type="text" required className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-600 font-medium" placeholder="Email သို့မဟုတ် ဖုန်းနံပါတ်" value={credential} onChange={(e) => setCredential(e.target.value)} />
-                    <input type="password" required className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-600 font-medium" placeholder="စကားဝှက်" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <button type="submit" className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-                        ဝင်ရောက်မည်
+                    <input type="password" required disabled={isLoading} className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-600 font-medium disabled:opacity-60" placeholder="စကားဝှက်" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <button type="submit" disabled={isLoading} className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        {isLoading && <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
+                        {isLoading ? "ဝင်နေပါသည်..." : "ဝင်ရောက်မည်"}
                     </button>
+                    {waking && (
+                        <p className="text-center text-xs text-gray-500 leading-relaxed">
+                            ⏳ ဆာဗာ ပြန်နိုးနေသောကြောင့် ပထမဆုံးအကြိမ် ၁ မိနစ်ခန့် ကြာနိုင်ပါသည်။ ခဏစောင့်ပေးပါ။ 🙏
+                        </p>
+                    )}
                 </form>
             </div>
         </div>

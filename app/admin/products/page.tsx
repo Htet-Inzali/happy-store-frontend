@@ -578,6 +578,19 @@ export default function AdminProductListPage() {
                                     <input required type="number" value={editForm.currentPriceVND} onChange={e => setEditForm((prev: any) => ({ ...prev, currentPriceVND: e.target.value }))} className="w-full p-2.5 rounded-xl border bg-gray-50 outline-none font-black text-blue-600" />
                                 </div>
                             </div>
+
+                            {/* 🌟 ပစ္စည်း အကြောင်းအရာ (Description) */}
+                            <div>
+                                <label className="text-[10px] font-black text-gray-500 block mb-1">ပစ္စည်း အကြောင်းအရာ (Description)</label>
+                                <textarea rows={3} placeholder="ဖော်ပြချက် / ပါဝင်ပစ္စည်း / အသုံးပြုနည်း..." value={editForm.description || ""} onChange={e => setEditForm((prev: any) => ({ ...prev, description: e.target.value }))} className="w-full p-2.5 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none resize-none" />
+                            </div>
+
+                            {/* 🌟 အရင်း/Stock (ဝယ်ဈေး၊ သယ်ယူခ၊ သက်တမ်း၊ လက်ကျန်) ကို Batches တွင် ပြင်ရန် shortcut */}
+                            <button type="button" onClick={() => { setIsEditProductModalOpen(false); setIsViewBatchesModalOpen(true); }}
+                                className="w-full py-3 rounded-xl bg-amber-50 text-amber-700 font-bold border border-amber-200 hover:bg-amber-100 transition-all text-sm">
+                                📋 အရင်း/Stock (ဝယ်ဈေး၊ သယ်ယူခ၊ သက်တမ်း၊ လက်ကျန်) ပြင်ရန် → Batches ဖွင့်မည်
+                            </button>
+
                             <button disabled={isSubmitting} type="submit" className="w-full py-4 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg">
                                 {isSubmitting ? "ပြင်ဆင်နေပါသည်..." : "အတည်ပြု ပြင်ဆင်မည်"}
                             </button>

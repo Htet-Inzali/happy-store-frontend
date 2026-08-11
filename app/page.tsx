@@ -68,11 +68,13 @@ export default function HomePage() {
       new Set(products.map((p: any) => p.category).filter((c: any) => c && String(c).trim() !== ""))
   ) as string[];
 
+  // 🌟 ရှာဖွေမှုကို space ဂရုမစိုက်ဘဲ ရှာနိုင်ရန် normalize (ဥပမာ "ဒံ ပေါက်" = "ဒံပေါက်")
+  const norm = (s: any) => String(s || "").toLowerCase().replace(/\s+/g, "");
+
   // 🌟 ရှာဖွေထားသော စာသား + category နဲ့ ကိုက်ညီတဲ့ ပစ္စည်းတွေကို စစ်ထုတ်ခြင်း
   const filteredProducts = products.filter((product: any) => {
-    const matchSearch =
-        (product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase()));
+    const q = norm(searchTerm);
+    const matchSearch = !q || norm(product.name).includes(q) || norm(product.sku).includes(q);
     const matchCategory = selectedCategory === "ALL" || product.category === selectedCategory;
     return matchSearch && matchCategory;
   });

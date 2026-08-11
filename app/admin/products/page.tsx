@@ -111,9 +111,11 @@ export default function AdminProductListPage() {
         }
     }, []);
 
+    // 🌟 space ဂရုမစိုက်ဘဲ ရှာနိုင်ရန် normalize ("ဒံ ပေါက်" = "ဒံပေါက်")
+    const norm = (s: any) => String(s || "").toLowerCase().replace(/\s+/g, "");
+    const q = norm(searchTerm);
     const filteredProducts = products.filter((p: any) =>
-        ((p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+        (!q || norm(p.name).includes(q) || norm(p.sku).includes(q)) &&
         (!lowStockOnly || (p.totalStock ?? 0) <= 5)
     );
 

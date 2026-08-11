@@ -284,6 +284,21 @@ export default function AdminProductListPage() {
         setIsEditBatchModalOpen(true);
     };
 
+    // 🌟 Batch (အသုတ်) တစ်ခုကို သီးသန့် ဖျက် (product မဖျက်ဘဲ)
+    const handleDeleteBatch = async (batchId: number) => {
+        if (!confirm("ဤအသုတ် (batch) ကို ဖျက်မှာ သေချာပါသလား?\n\n(ရောင်း/မှာယူထားပြီးသား အသုတ်ကို မှတ်တမ်းအတွက် မဖျက်နိုင်ပါ)")) return;
+        const toastId = toast.loading("အသုတ် ဖျက်နေသည်...");
+        try {
+            const res = await api.delete(`/admin/inventory/batches/${batchId}`);
+            if (res.data.success) {
+                toast.success("အသုတ်ကို ဖျက်ပြီးပါပြီ။", { id: toastId });
+                await fetchProducts();
+            }
+        } catch (e: any) {
+            toast.error(e.response?.data?.message || "ဖျက်၍ မရပါ", { id: toastId });
+        }
+    };
+
     const getResolvedUrl = (url: string) => {
         if (!url) return "https://via.placeholder.com/150";
         if (url.startsWith("http")) return url;
@@ -659,6 +674,7 @@ export default function AdminProductListPage() {
                                             <div className="flex space-x-2 items-center">
                                                 <span className="text-[10px] font-black px-2 py-1 rounded bg-green-100 text-green-700">EXP: {b.expiryDate || 'N/A'}</span>
                                                 <button onClick={() => openEditBatchModal(b)} className="px-2 py-1 bg-yellow-100 text-yellow-700 text-[10px] font-black rounded hover:bg-yellow-200 transition-colors">EDIT</button>
+                                                <button onClick={() => handleDeleteBatch(b.id)} title="ဤအသုတ်ကို ဖျက်မည်" className="px-2 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded hover:bg-red-500 hover:text-white transition-colors">🗑️ ဖျက်</button>
                                             </div>
                                         </div>
                                     </div>

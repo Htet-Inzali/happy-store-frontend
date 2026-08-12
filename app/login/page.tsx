@@ -41,9 +41,9 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-            <div className="w-full max-w-md bg-white p-10 rounded-4xl shadow-lg border border-gray-100">
-                <h2 className="text-3xl font-black text-center text-gray-900 mb-8">Login ဝင်ရန်</h2>
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-10">
+            <div className="w-full max-w-md bg-white p-6 sm:p-10 rounded-3xl sm:rounded-4xl shadow-lg border border-gray-100">
+                <h2 className="text-2xl sm:text-3xl font-black text-center text-gray-900 mb-6 sm:mb-8">Login ဝင်ရန်</h2>
                 <form onSubmit={handleLogin} className="space-y-5">
                     <input type="text" required className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-600 font-medium" placeholder="Email သို့မဟုတ် ဖုန်းနံပါတ်" value={credential} onChange={(e) => setCredential(e.target.value)} />
                     <input type="password" required disabled={isLoading} className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-600 font-medium disabled:opacity-60" placeholder="စကားဝှက်" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -57,6 +57,12 @@ export default function LoginPage() {
                         </p>
                     )}
                 </form>
+
+                {/* 🌟 Password မေ့သွားသူများအတွက် — self-service reset မထားသဖြင့် admin ဆက်သွယ်ရန် */}
+                <p className="mt-6 text-center text-xs text-gray-500 leading-relaxed border-t border-gray-100 pt-5">
+                    🔑 စကားဝှက် မေ့သွားပါသလား?<br />
+                    <span className="text-gray-400">ဆိုင် (Admin) သို့ ဆက်သွယ်၍ ပြန်လည်သတ်မှတ်ပေးရန် တောင်းဆိုနိုင်ပါသည်။</span>
+                </p>
             </div>
         </div>
     );

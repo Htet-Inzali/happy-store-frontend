@@ -94,17 +94,17 @@ export default function CartPage() {
     if (cartItems.length === 0) return <div className="text-center py-20 font-bold text-gray-500">ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိပါ။</div>;
 
     const renderItems = (items: any[]) => (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
             {items.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                <div key={item.id} className="flex items-center space-x-3 sm:space-x-4 bg-white p-3 sm:p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
                     <img
                         src={getResolvedImageUrl(item.imageUrl)}
-                        className="h-20 w-20 rounded-xl object-cover border border-gray-50"
+                        className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl object-cover border border-gray-50 shrink-0"
                         alt={item.name}
                         onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/300?text=No+Image" }}
                     />
-                    <div className="flex-1">
-                        <h3 className="text-sm font-bold text-gray-800">{item.name}</h3>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-gray-800 line-clamp-2">{item.name}</h3>
                         <p className="text-blue-600 font-black text-sm mt-1">{Number(item.currentPriceVND).toLocaleString()} VND</p>
                         <div className="mt-2 flex items-center bg-gray-50 w-fit rounded-lg border border-gray-100">
 
@@ -144,27 +144,27 @@ export default function CartPage() {
     );
 
     return (
-        <div className="bg-gray-50 min-h-screen py-10">
-            <div className="mx-auto max-w-7xl px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="bg-gray-50 min-h-screen py-6 sm:py-10">
+            <div className="mx-auto max-w-7xl px-3 sm:px-4 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
 
-                <div className="lg:col-span-7 space-y-8">
+                <div className="lg:col-span-7 space-y-6 sm:space-y-8">
                     {inStockItems.length > 0 && (
                         <div>
-                            <h2 className="text-xl font-black mb-4 text-gray-900 border-l-4 border-blue-600 pl-3">ချက်ချင်းရမည့် ပစ္စည်းများ</h2>
+                            <h2 className="text-lg sm:text-xl font-black mb-3 sm:mb-4 text-gray-900 border-l-4 border-blue-600 pl-3">ချက်ချင်းရမည့် ပစ္စည်းများ</h2>
                             {renderItems(inStockItems)}
                         </div>
                     )}
                     {preorderItems.length > 0 && (
                         <div>
-                            <h2 className="text-xl font-black mb-4 text-gray-900 border-l-4 border-orange-500 pl-3">ကြိုတင်မှာယူရမည့် (Preorder) ပစ္စည်းများ</h2>
+                            <h2 className="text-lg sm:text-xl font-black mb-3 sm:mb-4 text-gray-900 border-l-4 border-orange-500 pl-3">ကြိုတင်မှာယူရမည့် (Preorder) ပစ္စည်းများ</h2>
                             {renderItems(preorderItems)}
                         </div>
                     )}
                 </div>
 
                 <div className="lg:col-span-5">
-                    <div className="bg-white p-8 rounded-4xl shadow-xl shadow-gray-200/50 border border-gray-100 sticky top-24">
-                        <h2 className="text-xl font-black mb-6 border-b pb-4">အော်ဒါစာရင်းချုပ်</h2>
+                    <div className="bg-white p-5 sm:p-8 rounded-3xl sm:rounded-4xl shadow-xl shadow-gray-200/50 border border-gray-100 sticky top-20 sm:top-24">
+                        <h2 className="text-lg sm:text-xl font-black mb-5 sm:mb-6 border-b pb-4">အော်ဒါစာရင်းချုပ်</h2>
 
                         {inStockItems.length > 0 && (
                             <div className="mb-6 bg-blue-50/50 p-4 rounded-2xl border border-blue-50">

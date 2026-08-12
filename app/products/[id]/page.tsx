@@ -44,11 +44,11 @@ export default function ProductDetailPage() {
     );
 
     return (
-        <div className="bg-white min-h-screen pb-20">
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="bg-white min-h-screen pb-16">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-12 lg:px-8">
                 <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-12">
 
-                    <div className="aspect-square w-full overflow-hidden rounded-3xl bg-gray-50 border border-gray-100 shadow-inner">
+                    <div className="aspect-square w-full max-w-md mx-auto lg:max-w-none overflow-hidden rounded-2xl sm:rounded-3xl bg-gray-50 border border-gray-100 shadow-inner">
                         <img
                             src={product.imageUrl || "https://via.placeholder.com/600"}
                             alt={product.name}
@@ -56,11 +56,11 @@ export default function ProductDetailPage() {
                         />
                     </div>
 
-                    <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tight">{product.name}</h1>
+                    <div className="mt-6 sm:mt-16 lg:mt-0">
+                        <h1 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight leading-snug">{product.name}</h1>
 
-                        <div className="mt-4 flex items-center space-x-4">
-              <span className="text-3xl font-black text-blue-600">
+                        <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span className="text-2xl sm:text-3xl font-black text-blue-600">
                 {Number(product.currentPriceVND || 0).toLocaleString()} VND
               </span>
                             {product.totalStock > 0 ? (
@@ -70,21 +70,21 @@ export default function ProductDetailPage() {
                             )}
                         </div>
 
-                        <div className="mt-8 border-t border-gray-100 pt-8">
-                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">ပစ္စည်းအကြောင်းအသေးစိတ်</h3>
-                            <p className="text-base text-gray-600 leading-relaxed">
+                        <div className="mt-6 sm:mt-8 border-t border-gray-100 pt-6 sm:pt-8">
+                            <h3 className="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 sm:mb-4">ပစ္စည်းအကြောင်းအသေးစိတ်</h3>
+                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                                 {product.description || "ဤပစ္စည်းအတွက် အသေးစိတ်ဖော်ပြချက် မရှိသေးပါ။"}
                             </p>
                         </div>
 
-                        <div className="mt-10 flex space-x-4">
+                        <div className="mt-8 sm:mt-10 flex space-x-3 sm:space-x-4">
                             <button
                                 onClick={() => addToCart(product)}
-                                className={`flex-1 rounded-2xl py-4 text-base font-black text-white shadow-xl active:scale-95 transition-all ${product.totalStock > 0 ? "bg-blue-600 shadow-blue-100 hover:bg-blue-700" : "bg-orange-500 shadow-orange-100 hover:bg-orange-600"}`}
+                                className={`flex-1 rounded-xl sm:rounded-2xl py-3.5 sm:py-4 text-sm sm:text-base font-black text-white shadow-xl active:scale-95 transition-all ${product.totalStock > 0 ? "bg-blue-600 shadow-blue-100 hover:bg-blue-700" : "bg-orange-500 shadow-orange-100 hover:bg-orange-600"}`}
                             >
                                 {product.totalStock > 0 ? "ခြင်းတောင်းထဲထည့်မည်" : "ကြိုတင်မှာယူမည် (Preorder)"}
                             </button>
-                            <Link href="/cart" className="flex items-center justify-center rounded-2xl bg-gray-100 px-6 py-4 text-xl">🛒</Link>
+                            <Link href="/cart" className="flex items-center justify-center rounded-xl sm:rounded-2xl bg-gray-100 px-5 sm:px-6 py-3.5 sm:py-4 text-lg sm:text-xl">🛒</Link>
                         </div>
                     </div>
                 </div>

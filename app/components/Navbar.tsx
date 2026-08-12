@@ -27,7 +27,7 @@ export default function Navbar() {
     if (!isMounted) {
         return (
             <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between">
                     <div className="w-40 h-10 bg-gray-100 rounded-xl animate-pulse" />
                     <div className="w-32 h-10 bg-gray-100 rounded-xl animate-pulse" />
                 </div>
@@ -38,19 +38,19 @@ export default function Navbar() {
     return (
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex h-20 justify-between items-center">
+                <div className="flex h-16 sm:h-20 justify-between items-center">
 
                     {/* Left Side: Logo & Home Link */}
-                    <div className="flex items-center space-x-10">
-                        <Link href="/" className="flex items-center space-x-3 group">
+                    <div className="flex items-center space-x-6 sm:space-x-10">
+                        <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
                             <Image
                                 src="/default-happystore-logo.jpg"
                                 alt="Logo"
                                 width={40}
                                 height={40}
-                                className="rounded-xl shadow-md group-hover:scale-110 transition-all"
+                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-md group-hover:scale-110 transition-all"
                             />
-                            <span className="text-2xl font-black text-gray-900 uppercase hidden sm:block">
+                            <span className="text-xl sm:text-2xl font-black text-gray-900 uppercase hidden sm:block">
                                 Happy<span className="text-orange-500">Store</span>
                             </span>
                         </Link>
@@ -67,18 +67,18 @@ export default function Navbar() {
                     </div>
 
                     {/* Right Side: Actions & Auth */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-1.5 sm:space-x-4">
 
                         {/* 🌟 Mobile — ဝယ်ယူမှု မှတ်တမ်း icon (desktop တွင် ဘယ်ဘက် text link ရှိပြီးသား) */}
                         {!isAdmin && user && (
-                            <Link href="/orders" title="ဝယ်ယူမှု မှတ်တမ်း" className="md:hidden p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-2xl transition-all">
+                            <Link href="/orders" title="ဝယ်ယူမှု မှတ်တမ်း" className="md:hidden p-2.5 sm:p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-2xl transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
                             </Link>
                         )}
 
                         {/* 🌟 Admin မဟုတ်မှသာ Shopping Cart ကို ပြမည် */}
                         {!isAdmin && (
-                            <Link href="/cart" className="relative p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-2xl transition-all">
+                            <Link href="/cart" className="relative p-2.5 sm:p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-2xl transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.112 11.213a.75.75 0 0 1-.744.824H4.53a.75.75 0 0 1-.744-.824L4.897 8.507a.75.75 0 0 1 .744-.682h12.723a.75.75 0 0 1 .744.682Z" /></svg>
                                 {totalItems > 0 && (
                                     <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white scale-110">
@@ -89,7 +89,7 @@ export default function Navbar() {
                         )}
 
                         {user ? (
-                            <div className="flex items-center space-x-4 border-l pl-4 border-gray-100">
+                            <div className="flex items-center space-x-2 sm:space-x-4 border-l pl-2 sm:pl-4 border-gray-100">
                                 {/* 🌟 Admin ဖြစ်ပါက Admin Panel ခလုတ်ကို ပြမည် */}
                                 {isAdmin && (
                                     <Link href="/admin/orders" className="hidden md:flex items-center space-x-1 rounded-xl bg-red-50 px-4 py-2 text-xs font-black text-red-600 border border-red-200 hover:bg-red-100 transition-all">
@@ -107,11 +107,11 @@ export default function Navbar() {
                             </div>
                         ) : (
                             // 🌟 အကောင့်မဝင်ရသေးလျှင် Login နှင့် Register ခလုတ်များပြမည်
-                            <div className="flex items-center gap-2">
-                                <Link href="/login" className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-all">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                <Link href="/login" className="px-3 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-all whitespace-nowrap">
                                     ဝင်ရောက်မည်
                                 </Link>
-                                <Link href="/register" className="px-5 py-2.5 text-sm font-black bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all">
+                                <Link href="/register" className="px-3 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm font-black bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all whitespace-nowrap">
                                     အကောင့်ဖွင့်မည်
                                 </Link>
                             </div>

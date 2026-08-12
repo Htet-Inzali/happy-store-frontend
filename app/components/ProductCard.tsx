@@ -29,15 +29,15 @@ export default function ProductCard({ product }: { product: any }) {
     }
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-lg transition-all group flex flex-col h-full relative">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3 sm:p-4 hover:shadow-lg transition-all group flex flex-col h-full relative">
 
-            <div className="absolute top-6 left-6 z-10">
+            <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
                 {product.totalStock > 0 ? (
-                    <span className="bg-green-100 text-green-700 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+                    <span className="bg-green-100 text-green-700 text-[9px] sm:text-[10px] font-black px-2 py-1 sm:px-3 sm:py-1.5 rounded-full uppercase tracking-wider sm:tracking-widest shadow-sm">
                         Stock: {product.totalStock}
                     </span>
                 ) : (
-                    <span className="bg-orange-100 text-orange-600 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+                    <span className="bg-orange-100 text-orange-600 text-[9px] sm:text-[10px] font-black px-2 py-1 sm:px-3 sm:py-1.5 rounded-full uppercase tracking-wider sm:tracking-widest shadow-sm">
                         Preorder
                     </span>
                 )}
@@ -52,11 +52,11 @@ export default function ProductCard({ product }: { product: any }) {
                         onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/300?text=No+Image" }}
                     />
                 </div>
-                <div className="mt-4">
-                    <h3 className="text-sm font-bold text-gray-800 line-clamp-2">{product.name}</h3>
-                    <p className="text-xs font-medium mt-1.5 text-gray-500">
+                <div className="mt-3">
+                    <h3 className="text-xs sm:text-sm font-bold text-gray-800 line-clamp-2 leading-snug">{product.name}</h3>
+                    <p className="text-[11px] sm:text-xs font-medium mt-1 text-gray-500">
                         {product.totalStock > 0 ? (
-                            <span className="text-green-600">လက်ကျန်: {product.totalStock} ခု ရနိုင်ပါသည်</span>
+                            <span className="text-green-600">လက်ကျန်: {product.totalStock} ခု</span>
                         ) : (
                             <span className="text-orange-500">ကြိုတင်မှာယူမှသာ ရနိုင်ပါမည်</span>
                         )}
@@ -64,16 +64,16 @@ export default function ProductCard({ product }: { product: any }) {
                 </div>
             </Link>
 
-            <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <span className="text-blue-600 font-black text-lg">
-                    {Number(product.currentPriceVND || 0).toLocaleString()} VND
+            <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                <span className="text-blue-600 font-black text-sm sm:text-lg whitespace-nowrap">
+                    {Number(product.currentPriceVND || 0).toLocaleString()} ₫
                 </span>
 
                 {/* 🌟 Admin ဆိုလျှင် 'Preview Only' ဟုသာ ပြမည် */}
                 {!isAdmin ? (
                     <button
                         onClick={handleAddToCart}
-                        className={`font-bold text-sm px-4 py-2 rounded-xl transition-colors ${
+                        className={`shrink-0 font-bold text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-xl transition-colors whitespace-nowrap ${
                             product.totalStock > 0
                                 ? 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white'
                                 : 'bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-600 hover:text-white'
@@ -82,7 +82,7 @@ export default function ProductCard({ product }: { product: any }) {
                         {product.totalStock > 0 ? "ဝယ်မည်" : "Preorder"}
                     </button>
                 ) : (
-                    <div className="text-xs font-bold text-gray-400 py-2 border border-dashed border-gray-300 px-3 rounded-lg bg-gray-50">Preview Only</div>
+                    <div className="shrink-0 text-xs font-bold text-gray-400 py-2 border border-dashed border-gray-300 px-3 rounded-lg bg-gray-50">Preview</div>
                 )}
             </div>
         </div>

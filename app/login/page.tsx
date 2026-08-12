@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import api from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -58,11 +59,14 @@ export default function LoginPage() {
                     )}
                 </form>
 
-                {/* 🌟 Password မေ့သွားသူများအတွက် — self-service reset မထားသဖြင့် admin ဆက်သွယ်ရန် */}
-                <p className="mt-6 text-center text-xs text-gray-500 leading-relaxed border-t border-gray-100 pt-5">
-                    🔑 စကားဝှက် မေ့သွားပါသလား?<br />
-                    <span className="text-gray-400">ဆိုင် (Admin) သို့ ဆက်သွယ်၍ ပြန်လည်သတ်မှတ်ပေးရန် တောင်းဆိုနိုင်ပါသည်။</span>
-                </p>
+                {/* 🌟 Password မေ့သွားသူများအတွက် — email ရှိသူ self-service, မရှိသူ admin */}
+                <div className="mt-6 text-center text-xs text-gray-500 leading-relaxed border-t border-gray-100 pt-5">
+                    <p className="mb-1">🔑 စကားဝှက် မေ့သွားပါသလား?</p>
+                    <Link href="/forgot-password" className="font-bold text-blue-600 hover:underline">
+                        Email ဖြင့် ပြန်သတ်မှတ်မည်
+                    </Link>
+                    <p className="text-gray-400 mt-2">Email မထည့်ခဲ့ပါက — ဆိုင် (Admin) သို့ ဆက်သွယ်ပါ။</p>
+                </div>
             </div>
         </div>
     );

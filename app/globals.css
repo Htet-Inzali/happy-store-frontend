@@ -20,3 +20,21 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
+
+/* 🌟 ကြေညာ banner — စာသား ဘယ်ဘက်သို့ ပြေးဆင်းသွားခြင်း (marquee) */
+@keyframes hs-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.hs-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+  animation: hs-marquee 30s linear infinite;
+}
+.hs-marquee:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hs-marquee { animation: none; }
+}

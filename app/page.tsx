@@ -110,9 +110,26 @@ export default function HomePage() {
   return (
       <div className="container mx-auto px-3 sm:px-4 py-5 sm:py-8 max-w-7xl font-myanmar">
 
+        {/* 🌟 Welcome Hero */}
+        <div className="mb-6 sm:mb-10 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-6 sm:p-10 shadow-lg shadow-blue-200/50 relative overflow-hidden">
+          <div className="relative z-10">
+            <h1 className="text-2xl sm:text-4xl font-black leading-tight">မြန်မာ့ အရသာ — ဗီယက်နမ်အရောက် 🇲🇲</h1>
+            <p className="mt-2 sm:mt-3 text-sm sm:text-base text-blue-100 max-w-xl leading-relaxed">
+              HappyStore မှ မြန်မာ ကုန်ခြောက်နှင့် အစားအသောက် ပစ္စည်းများကို လွယ်ကူစွာ ရွေးချယ် မှာယူနိုင်ပါပြီ။
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs sm:text-sm font-bold">
+              <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">🛒 ခြင်းတောင်းထဲထည့်</span>
+              <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">📦 Order တင်</span>
+              <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full">🚚 အိမ်အရောက် / ဆိုင်လာယူ</span>
+            </div>
+          </div>
+          <div className="absolute -right-8 -top-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
+          <div className="absolute right-20 -bottom-12 w-36 h-36 bg-white/5 rounded-full pointer-events-none"></div>
+        </div>
+
         {/* 🌟 Search Bar & Title Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-10 gap-3 sm:gap-4">
-          <h1 className="text-xl sm:text-3xl font-black text-gray-900 border-l-4 border-yellow-400 pl-3 sm:pl-4">ပစ္စည်းအသစ်များ</h1>
+          <h2 className="text-xl sm:text-3xl font-black text-gray-900 border-l-4 border-yellow-400 pl-3 sm:pl-4">ပစ္စည်းအသစ်များ</h2>
 
           {/* Search Input */}
           <div className="relative w-full md:w-96">

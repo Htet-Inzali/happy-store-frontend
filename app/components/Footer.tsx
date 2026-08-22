@@ -34,8 +34,8 @@ export default function Footer() {
                         <h3 className="text-xs font-black text-white uppercase tracking-widest mb-4">ဆက်သွယ်ရန်</h3>
                         <ul className="space-y-3 text-sm">
                             <li>
-                                <a href="tel:+84365750492" className="flex items-center gap-2 hover:text-white transition-colors">
-                                    <span>📞</span> +84 36 575 0492 <span className="text-gray-500 text-xs">(Zalo)</span>
+                                <a href="https://zalo.me/84365750492" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-white transition-colors">
+                                    <span>💬</span> +84 36 575 0492 <span className="text-gray-500 text-xs">(Zalo)</span>
                                 </a>
                             </li>
                             <li>

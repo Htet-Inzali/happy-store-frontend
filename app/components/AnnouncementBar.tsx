@@ -8,7 +8,6 @@ const messages = [
     "🎉 HappyStore — မြန်မာ့ အရသာ ဗီယက်နမ်အရောက်",
     "📍 FPT City, DaNang City",
     "📞 Order / ဆက်သွယ်ရန်: +84 36 575 0492 (Zalo) · +886 976 399 644 (WhatsApp)",
-    "✨ ပစ္စည်းအသစ်များ ပုံမှန် ရောက်ရှိနေပါသည်",
 ];
 
 export default function AnnouncementBar() {
